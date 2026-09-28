@@ -1,0 +1,35 @@
+# Environment (keep secrets out of git)
+.env
+.env.local
+.env.*.local
+!.env.example
+
+# Dependencies & build
+node_modules/
+dist/
+build/
+.next/
+out/
+.turbo/
+.vercel/
+
+# Playwright
+playwright/.auth/
+.test-artifacts/
+test-results/
+playwright-report/
+blob-report/
+.playwright-mcp/
+.playwright-cli/
+
+# Logs & OS
+*.log
+npm-debug.log*
+.DS_Store
+Thumbs.db
+
+# IDE (optional local overrides)
+.idea/
+
+# Test / coverage
+coverage/
