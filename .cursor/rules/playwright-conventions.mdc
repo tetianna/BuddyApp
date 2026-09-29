@@ -1,0 +1,357 @@
+﻿---
+description: How this project writes Playwright tests — locators, waiting, POM, auth, data, API, mocking, accessibility, assertions, and anti-flake. Apply to all test work under tests/.
+globs: tests/**
+alwaysApply: false
+---
+
+Project Playwright conventions for everything under `tests/`. The constitution (`constitution.mdc`) states non-negotiables; this file shows how to apply them day to day.
+
+**At a glance**
+
+1. **Locators** — Prefer roles and accessible names; reserve test ids and flag CSS/XPath for review.
+2. **Waiting** — Let `expect()` auto-wait; never sleep or assert on awaited booleans.
+3. **Page Object Model** — Encapsulate locators and actions; keep assertions in specs.
+4. **Auth** — One login per family in setup; reuse `storageState`; env-backed credentials.
+5. **Test data** — Unique, self-cleaning data; no shared-environment collisions or order dependence.
+6. **Tags** — One tag per `test()`; `@destructive` only for shared global state with serial workers.
+7. **Test data sources** — Factories, static invalid sets, env secrets, enums for repeated strings.
+8. **API** — `request` for setup/teardown and contracts; not slow UI prerequisites.
+9. **Network mocking** — Simulate failure and edge responses; never mock the SUT endpoint.
+10. **Accessibility** — axe on key pages plus keyboard paths; roles with names match real UI.
+11. **Assertions** — Web-first `expect`; soft checks when needed; masked screenshots only.
+12. **Anti-flake** — Isolation and clocks over retries/worker hacks; trace on first retry in CI.
+
+---
+
+## 1. Locators
+
+Prefer locators that mirror what users see and assistive tech exposes: `getByRole`, then `getByLabel` / `getByPlaceholder`, then `getByText`, then `getByTestId`. Raw CSS and XPath are a smell—flag them for human review.
+
+✅ **Good**
+
+```typescript
+await page.getByRole("button", { name: "Save changes" }).click();
+await page.getByLabel("Work email").fill(email);
+await page.getByPlaceholder("Search courses").fill(query);
+```
+
+❌ **Bad**
+
+```typescript
+await page.locator("#save-btn").click();
+await page.locator('//button[contains(@class,"primary")]').click();
+```
+
+**Why:** Role- and name-based locators survive restyling and match accessibility contracts; CSS/XPath tie tests to implementation detail.
+
+---
+
+## 2. Waiting
+
+Playwright’s web-first assertions retry until timeout. Never guess time with `waitForTimeout`, and never await a boolean then assert it.
+
+✅ **Good**
+
+```typescript
+await expect(page.getByRole("heading", { name: "Overview" })).toBeVisible();
+await expect(page).toHaveURL(/\/dashboard/);
+```
+
+❌ **Bad**
+
+```typescript
+await page.waitForTimeout(2000);
+await expect(await row.isVisible()).toBe(true);
+```
+
+**Why:** Fixed delays race the app; snapshot booleans skip Playwright’s built-in waiting and flake under load.
+
+---
+
+## 3. Page Object Model
+
+One POM per page or meaningful component. Define locators in the constructor; methods express user actions only. Specs own assertions.
+
+✅ **Good**
+
+```typescript
+export class SettingsPage {
+  constructor(private readonly page: Page) {
+    this.displayName = page.getByLabel("Display name");
+  }
+  private readonly displayName: Locator;
+
+  /** @param name New display name to submit */
+  async updateDisplayName(name: string): Promise<void> {
+    await this.displayName.fill(name);
+    await this.page.getByRole("button", { name: "Save" }).click();
+  }
+}
+
+// spec
+await settings.updateDisplayName(uniqueName);
+await expect(page.getByText(uniqueName)).toBeVisible();
+```
+
+❌ **Bad**
+
+```typescript
+export class SettingsPage extends BasePage {
+  async assertSaved(): Promise<void> {
+    await expect(this.page.getByText("Saved")).toBeVisible();
+  }
+}
+```
+
+**Why:** POMs stay reusable action layers; assertions in specs keep failure messages close to the scenario under test.
+
+---
+
+## 4. Auth
+
+Log in once per credential family in the setup project and persist `storageState`. Use `AUTH_FILE` for the primary family and `ALT_AUTH_FILE` for the second. Two-family flows open a second context with `browser.newContext({ storageState: ALT_AUTH_FILE })`. Read credentials from `process.env`; never log in inside every test.
+
+✅ **Good**
+
+```typescript
+// playwright.config.ts — setup project writes AUTH_FILE / ALT_AUTH_FILE
+test.use({ storageState: AUTH_FILE });
+
+test("collaborator sees shared item @smoke", async ({ browser }) => {
+  const owner = await browser.newContext({ storageState: AUTH_FILE });
+  const collaborator = await browser.newContext({ storageState: ALT_AUTH_FILE });
+  // ...
+});
+```
+
+❌ **Bad**
+
+```typescript
+test.beforeEach(async ({ page }) => {
+  await page.goto("/login");
+  await page.getByLabel("Email").fill(process.env.E2E_USER_EMAIL!);
+  await page.getByLabel("Password").fill(process.env.E2E_USER_PASSWORD!);
+});
+```
+
+**Why:** Setup-time auth is fast and stable; per-test UI login multiplies flake and tempts hardcoded secrets.
+
+---
+
+## 5. Test data
+
+Every test creates data it can identify uniquely (factory or `Date.now()` suffix) and tears it down via API or UI. Tests must not depend on run order or on another student’s rows in the shared environment.
+
+✅ **Good**
+
+```typescript
+const title = `Assignment ${Date.now()}`;
+await api.post("/assignments", { data: { title } });
+test.info().attach("assignmentId", { body: id });
+// afterEach: DELETE via request fixture
+```
+
+❌ **Bad**
+
+```typescript
+const title = "My assignment"; // same every run
+test.describe.configure({ mode: "serial" });
+test("B updates shared row", async () => { /* assumes test A ran */ });
+```
+
+**Why:** Parallel CI and shared tenants need isolation; unique data plus cleanup prevents cross-talk and order coupling.
+
+---
+
+## 6. Tags
+
+Exactly one tag per `test()`: `@smoke` (every PR), `@sanity` (every push), `@regression` (full suite on manual dispatch), `@api`, `@e2e`, `@destructive` (only when mutating **shared/global** state both families rely on—run with `--workers=1`). Never tag `describe()`. Tests that only touch their own data are not `@destructive`. Any state-mutating test reverts in `afterEach` / `afterAll`.
+
+✅ **Good**
+
+```typescript
+test("lists courses after filter @sanity", async ({ page }) => { /* ... */ });
+
+test("disables org-wide feature flag @destructive", async ({ request }) => {
+  // mutates settings everyone shares; restore in afterAll
+});
+```
+
+❌ **Bad**
+
+```typescript
+test.describe("Checkout", { tag: "@smoke" }, () => {
+  test("pays @smoke @regression", async () => { /* two tags */ });
+});
+```
+
+**Why:** Tags drive CI selection; describe-level or duplicate tags skew reporting, and `@destructive` must mean truly shared blast radius.
+
+---
+
+## 7. Test data sources
+
+Build dynamic values in `test-data/factories/` (Faker + `Date.now()`). Keep static invalid payloads in `test-data/*.ts`. Load secrets and base URLs from `process.env`. Centralize repeated strings in enums (e.g. `test-data/routes.ts`).
+
+✅ **Good**
+
+```typescript
+import { buildUser } from "../test-data/factories/user.factory";
+import { Routes } from "../test-data/routes";
+
+const user = buildUser();
+await page.goto(Routes.settings);
+```
+
+❌ **Bad**
+
+```typescript
+await page.goto("https://app.example.com/settings");
+const email = "testuser+static@mail.com";
+```
+
+**Why:** Factories and enums keep specs readable; env and route modules avoid drift when environments change.
+
+---
+
+## 8. API
+
+Use the `request` fixture for setup, teardown, and contract checks. When a backend endpoint exists, do not create prerequisite data by clicking through the UI.
+
+✅ **Good**
+
+```typescript
+test("shows imported row @api", async ({ page, request }) => {
+  const { id } = await createRowViaApi(request);
+  await page.goto(`/rows/${id}`);
+  await expect(page.getByRole("cell", { name: id })).toBeVisible();
+});
+```
+
+❌ **Bad**
+
+```typescript
+test("shows imported row @e2e", async ({ page }) => {
+  await page.goto("/import");
+  // 12 UI steps to seed one row before the assertion under test
+});
+```
+
+**Why:** API setup is faster, clearer, and failures point at the layer you intend to test.
+
+---
+
+## 9. Network mocking
+
+Use `page.route` / `route.fulfill` to simulate 500, 503, timeout, empty lists, or malformed payloads. Never mock the endpoint whose behavior the test is meant to validate.
+
+✅ **Good**
+
+```typescript
+await page.route("**/notifications", (route) =>
+  route.fulfill({ status: 503, body: "Service unavailable" }),
+);
+await page.goto("/inbox");
+await expect(page.getByRole("alert")).toContainText("try again");
+```
+
+❌ **Bad**
+
+```typescript
+// Test title: "POST /enroll persists seat"
+await page.route("**/enroll", (route) =>
+  route.fulfill({ status: 200, body: JSON.stringify({ ok: true }) }),
+);
+```
+
+**Why:** Mock dependencies and failure modes, not the contract you are trying to prove.
+
+---
+
+## 10. Accessibility
+
+Run `@axe-core/playwright` with `wcag2a` / `wcag2aa` tags on key pages. Add a keyboard-operability check on primary flows. Locators that use `getByRole(..., { name })` should match real accessible names.
+
+✅ **Good**
+
+```typescript
+import AxeBuilder from "@axe-core/playwright";
+
+test("settings passes axe @regression", async ({ page }) => {
+  await page.goto("/settings");
+  const results = await new AxeBuilder({ page })
+    .withTags(["wcag2a", "wcag2aa"])
+    .analyze();
+  expect(results.violations).toEqual([]);
+  await page.keyboard.press("Tab");
+  await expect(page.getByRole("button", { name: "Save" })).toBeFocused();
+});
+```
+
+❌ **Bad**
+
+```typescript
+test("looks fine", async ({ page }) => {
+  await page.goto("/settings");
+  // no scan, no keyboard path; clicks only via brittle CSS
+});
+```
+
+**Why:** Automated WCAG scans catch regressions early; keyboard checks prove focus order matches real usage.
+
+---
+
+## 11. Assertions
+
+Default to web-first `expect(locator)`. Use `expect.soft` when one scenario needs several independent checks. Use `toHaveScreenshot` only with dynamic regions masked.
+
+✅ **Good**
+
+```typescript
+await expect.soft(card).toContainText("Due tomorrow");
+await expect.soft(card.getByRole("link", { name: "Open" })).toBeVisible();
+await expect(page).toHaveScreenshot({ mask: [page.locator(".timestamp")] });
+```
+
+❌ **Bad**
+
+```typescript
+const text = await card.textContent();
+expect(text).toContain("Due tomorrow");
+await expect(page).toHaveScreenshot(); // clock, avatars, ads unmasked
+```
+
+**Why:** Locator assertions auto-wait; soft asserts surface all failures; masked screenshots avoid cosmetic flake.
+
+---
+
+## 12. Anti-flake
+
+Retries belong in CI configuration only—not as a local crutch. Keep tests isolated. Use `page.clock` when behavior depends on “now” (availability windows, calendars). Pin locale and timezone in config. Enable trace on first retry. Raising `retries: 5` or forcing `workers: 1` is not a substitute for fixing root cause.
+
+✅ **Good**
+
+```typescript
+test("shows slot on booked day @regression", async ({ page }) => {
+  await page.clock.install({ time: new Date("2026-01-15T10:00:00Z") });
+  await page.goto("/schedule");
+  await expect(page.getByRole("button", { name: "10:00 AM" })).toBeEnabled();
+});
+```
+
+❌ **Bad**
+
+```typescript
+// playwright.config.ts
+retries: 5,
+workers: 1, // "fixes" every test
+// spec: no clock; uses real today and hopes CI timezone matches laptop
+```
+
+**Why:** Isolation and controlled time remove race conditions; traces diagnose real failures instead of masking them with retries.
+
+---
+
+## Refusals (hard stops)
+
+Never weaken or delete an assertion to pass. Never “heal” a real product bug—triage, then fix the app or open a defect. Never replace a role locator with CSS or XPath to unblock a test. Never use `waitForTimeout`, a hardcoded credential, or the `any` type. Each of these is a conflict the agent must raise; they are not preferences that can be negotiated away.
