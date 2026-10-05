@@ -1,0 +1,34 @@
+---
+description: Write to the user in clear, simple English (ESL-friendly). Avoid rare abbreviations and jargon.
+alwaysApply: true
+---
+
+The project owner uses English as a second language. In **chat, summaries, tables, and commit/PR text you draft for them**, use language that is easy to read.
+
+## Do
+
+- Use **short sentences** and common words.
+- Write **full words** first time you use a term (for example: "pull request" not only "PR").
+- Explain **technical terms** in plain language when they are not obvious (for example: "page object" = a file that describes one screen and its buttons).
+- Keep the same meaning; do not hide important details.
+
+## Avoid
+
+- **Rare or insider abbreviations** (for example: ESL, POM, a11y, E2E, UX, CI/CD, LGTM, AFAIK, IMO, tldr).
+- **Stacked jargon** in one sentence (for example: "refactor the POM locators for the a11y tree").
+- **Telegraphic lists** that drop verbs (for example: "Fixed. Tests green. Ship it.").
+
+## OK when needed
+
+- Widely known tech names the repo already uses: **Playwright**, **GitHub**, **Jira**, file paths, code identifiers.
+- Short forms **after** the full phrase once in the same message (for example: "continuous integration (CI)" then "CI" later).
+
+## Examples
+
+| Prefer | Avoid |
+|--------|--------|
+| "I updated the login page file so tests can find the Email field." | "Updated LoginPage POM w/ getByLabel." |
+| "The test failed because the page loaded too slowly." | "Flake due to race in hydration." |
+| "Open the settings page and click Save." | "Hit /settings and smash save." |
+
+Code comments and variable names in the repo follow normal developer English; this rule applies to **how you explain things to the user**.
