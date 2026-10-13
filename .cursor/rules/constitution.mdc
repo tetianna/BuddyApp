@@ -3,7 +3,7 @@ description: Always-on Playwright constitution — non-negotiables, preferences,
 alwaysApply: true
 ---
 
-Non-negotiables for every task. Details and examples: `playwright-conventions.mdc` (tests) and `qa-orchestrator.mdc` (ticket/CI workflow) — both added later.
+Non-negotiables for every task. Details and examples: `playwright-conventions.mdc` (tests) and `qa-orchestrator.mdc` (ticket/CI workflow).
 
 ## MUST
 
@@ -39,9 +39,28 @@ Non-negotiables for every task. Details and examples: `playwright-conventions.md
 
 ## Index
 
-**Skills** (`.cursor/skills/`): `api-cleanup`, `ci-failure-triage`, `eval-report`, `exploratory-charter`, `explore-and-generate`, `jira-bug-reporter`, `jira-ticket-analyzer`, `pom-conventions`, `self-heal`, `test-data-reset`
+**Skills** (`.cursor/skills/`)
 
-**Agents** (`.cursor/agents/`): `test-writer`, `triage`, `bug-reporter`
+| Skill | Role |
+|-------|------|
+| `api-cleanup` | Teardown test data |
+| `ci-failure-triage` | Classify red CI |
+| `eval-report` | Refresh suite metrics |
+| `exploratory-charter` | Session charter template |
+| `explore-and-generate` | Ticket-less gap plans |
+| `jira-bug-reporter` | Draft and file bugs |
+| `jira-ticket-analyzer` | Ticket → Gherkin plan |
+| `pom-conventions` | POM structure rules |
+| `self-heal` | Fix locator drift |
+| `test-data-reset` | Bulk env cleanup |
+
+**Agents** (`.cursor/agents/`)
+
+| Agent | Role |
+|-------|------|
+| `test-writer` | Write Playwright specs |
+| `triage` | Diagnose failed runs |
+| `bug-reporter` | File linked Jira bugs |
 
 ## Agent governance
 
