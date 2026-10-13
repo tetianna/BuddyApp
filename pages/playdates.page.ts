@@ -3,10 +3,12 @@ import type { Locator, Page } from '@playwright/test';
 import { AppRoute } from '../test-data/routes';
 import { FindPlaydateRequestFormComponent } from './components/find-playdate-request-form.component';
 import { HeaderComponent } from './components/header.component';
+import { PlaydateListsComponent } from './components/playdate-lists.component';
 
 export class PlaydatesPage {
   readonly header: HeaderComponent;
   readonly requestForm: FindPlaydateRequestFormComponent;
+  readonly lists: PlaydateListsComponent;
   readonly pendingRequestsLabel: Locator;
   readonly upcomingLabel: Locator;
   readonly pastLabel: Locator;
@@ -17,6 +19,7 @@ export class PlaydatesPage {
   constructor(private readonly page: Page) {
     this.header = new HeaderComponent(page);
     this.requestForm = new FindPlaydateRequestFormComponent(page);
+    this.lists = new PlaydateListsComponent(page);
     this.pendingRequestsLabel = page.getByText('Pending requests', { exact: true });
     this.upcomingLabel = page.getByText('Upcoming', { exact: true });
     this.pastLabel = page.getByText('Past', { exact: true });

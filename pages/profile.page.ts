@@ -17,6 +17,8 @@ export class ProfilePage {
   readonly notificationSettingsButton: Locator;
   readonly deleteAccountButton: Locator;
   readonly myAvailabilityButton: Locator;
+  readonly calendarSyncButton: Locator;
+  readonly statusToast: Locator;
 
   constructor(private readonly page: Page) {
     this.header = new HeaderComponent(page);
@@ -42,6 +44,11 @@ export class ProfilePage {
     this.myAvailabilityButton = page.getByRole('button', {
       name: 'My Availability Weekly slots',
     });
+    this.calendarSyncButton = page.getByRole('button', {
+      name: 'Calendar Sync Add-to-calendar links soon',
+      exact: true,
+    });
+    this.statusToast = page.getByRole('status');
   }
 
   /** Opens the signed-in profile and settings page. */
@@ -62,5 +69,10 @@ export class ProfilePage {
   /** Opens notification preferences (status feedback only in current build). */
   async openNotificationSettings(): Promise<void> {
     await this.notificationSettingsButton.click();
+  }
+
+  /** Clicks **Calendar Sync** (status toast only in current build). */
+  async openCalendarSync(): Promise<void> {
+    await this.calendarSyncButton.click();
   }
 }
