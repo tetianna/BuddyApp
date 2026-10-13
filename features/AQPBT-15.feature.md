@@ -83,3 +83,5 @@ Feature: Profile — your details (display name, optional phone)
   #   (browser back, other sidebar links) are unverified and out of scope.
   # - Where the display name appears to other families is out of scope (ticket Out of scope).
   # - Family details, kids, settings shortcuts, delete account, and SMS reminders are out of scope.
+  #
+  # Test automation: tests/aqpbt-15-profile-your-details.spec.ts (AC 1–5 plus edge cases)
