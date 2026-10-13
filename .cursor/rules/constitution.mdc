@@ -41,7 +41,7 @@ Non-negotiables for every task. Details and examples: `playwright-conventions.md
 
 **Skills** (`.cursor/skills/`): `api-cleanup`, `ci-failure-triage`, `eval-report`, `exploratory-charter`, `explore-and-generate`, `jira-bug-reporter`, `jira-ticket-analyzer`, `pom-conventions`, `self-heal`, `test-data-reset`
 
-**Agents** (`.cursor/agents/`): `test-writer`, `triage`
+**Agents** (`.cursor/agents/`): `test-writer`, `triage`, `bug-reporter`
 
 ## Agent governance
 
