@@ -60,7 +60,7 @@ jobs:
         env:
           CURSOR_API_KEY: ${{ secrets.CURSOR_API_KEY }}
           ATLASSIAN_API_TOKEN: ${{ secrets.ATLASSIAN_API_TOKEN }}
-          CURSOR_GH_MCP: ${{ secrets.CURSOR_GH_MCP }}
+          CURSOR_GITHUB_TOKEN: ${{ secrets.CURSOR_GITHUB_TOKEN }}
         run: |
           agent -p --force --trust --output-format text "$(cat <<'EOF'
           You are the QA orchestrator in **Backlog mode**. Treat `.cursor/rules/qa-orchestrator.mdc` as authoritative; follow it completely for this run.
@@ -82,7 +82,7 @@ jobs:
 
           ## Tools
           - Atlassian: MCP or REST with `ATLASSIAN_*` env.
-          - GitHub: MCP via `CURSOR_GH_MCP` when available; otherwise `gh` with `GITHUB_TOKEN`.
+          - GitHub: MCP via `CURSOR_GITHUB_TOKEN` when available; otherwise `gh` with `GITHUB_TOKEN`.
           ## Write scope
           Allowed: `features/`, `tests/`, `pages/`, `test-data/`, `eval-report.md`. Do not edit app source or weaken assertions.
           EOF
