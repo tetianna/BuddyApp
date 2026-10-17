@@ -1,23 +1,27 @@
 ---
 name: eval-report
-description: Refreshes eval-report.md — flake rate, heal success, generation-gate pass rate, ask-vs-guess — from CI logs, PR history, and session review. Use when the orchestrator closes a session, after a heal chain, at the end of backlog mode, when the user asks for suite reliability, or when eval-report.md is stale (>14 days). Cursor has no built-in telemetry; this skill defines how to measure each metric manually.
+description: Refreshes eval-report.md — flake rate, heal success, generation-gate pass rate, ask-vs-guess, and orchestrator session confidence — from CI logs, PR history, and session review. Mandatory when the orchestrator closes any session (ticket, backlog, or heal). Also run after a heal chain, when the user asks for suite reliability, or when eval-report.md is stale (>14 days). Cursor has no built-in telemetry; this skill defines how to measure each metric manually.
 ---
 
 # Eval report (`eval-report.md`)
 
 Refresh **suite reliability metrics** at the repo root. **Report only** — no Jira tickets, no test or POM edits.
 
+**Gold standard:** match the tone and depth of the current repo root `eval-report.md` (Session log with **N/10**, plain-language unknowns, a short **Latest session confidence** paragraph that says why the score is not higher, honest **insufficient data** where CI is thin, and concrete **Top reliability risk** / **Next action**). Update that file in place; do not shrink future reports to a stub.
+
 ## When it is mandatory
 
-Run a full refresh if **any** trigger applies:
+**Always** update `eval-report.md` when the **qa-orchestrator** (or any user-driven ticket end-to-end run) closes a session. Do **not** skip with `eval: skipped`.
 
 | Trigger | Action |
 |---------|--------|
+| **Orchestrator session closes** (success, heal PR, bug draft, or escalate) | Full metrics **and** append **Session log** row (confidence required) |
 | A **heal** PR was opened or a **red run** was triaged | Full metrics |
 | A **generation** PR was opened (ticket-first test work) | Full metrics |
 | `eval-report.md` **missing** or **older than 14 days** | Full metrics |
+| User asks for suite reliability | Full metrics |
 
-If **none** apply, reply with **`eval: skipped — no trigger`** and do not rewrite the file unless the user insists.
+If CI history is thin, still write the file: use **insufficient data** for numeric metrics, but always record the **Session log** row for the work just finished.
 
 ## Inputs
 
@@ -91,6 +95,22 @@ For **each** metric, record:
 
 **Interpretation:** More guess than ask → reinforce constitution “unknowns” and skills (jira-ticket-analyzer, no invented endpoints).
 
+### 5. Session confidence (orchestrator)
+
+**Definition:** the orchestrator **Proposal** **Confidence** score (1–10) for the ticket or failure handled this session, plus whether the **confidence gate** was satisfied.
+
+**How:**
+
+- Prefer the session’s **Proposal** block (constitution agent governance). If it was never emitted, assign a **retroactive N/10** from evidence (Jira, Confluence, live app, PR/CI) and say so in **Latest session confidence** and **Top reliability risk**.
+- **Unknowns** column: short plain-language bullets in one cell (not `TBD`); use `none` only when truly none.
+- **Confidence** column: always **`N/10`** (bold in markdown is OK).
+- **Outcome:** concrete status — e.g. `spec green locally (3 tests) + generation PR open; tests-generated on Jira`.
+- Link **Jira key**, **PR**, and **feature file** when they exist.
+
+**Latest session confidence** (required paragraph under Session log): one or two sentences — what evidence supported the score and **why it is not 9–10** (missing docs, shared-account cleanup, no Proposal in chat, etc.).
+
+**Interpretation:** Sessions with confidence **&lt; 8** or non-empty unknowns → treat generation-gate risk as higher until Confluence or live-app evidence closes gaps.
+
 ## Rules
 
 | Rule | Detail |
@@ -98,7 +118,8 @@ For **each** metric, record:
 | Missing data | Write **insufficient data** for that metric — **never guess** a number. |
 | Cleanup 404s | API cancel/delete **404** in teardown logs are **noise**, not flakes. |
 | Scope | **No** tickets, **no** test or POM changes in this skill. |
-| Close | End with **Top reliability risk** (one sentence) and **Next action** (one concrete step). |
+| Close | **Top reliability risk** (one sentence, tie to latest confidence/unknowns) and **Next action** (one concrete step, e.g. merge PR, add Confluence page, emit Proposal next run). |
+| Style | Write for the project owner (clear English, no insider abbreviations). Prefer links to PRs and run ids over vague “CI passed”. |
 
 ## Output: `eval-report.md`
 
@@ -109,7 +130,17 @@ Write or replace at **repo root**:
 
 **Generated:** YYYY-MM-DD  
 **Window:** last N Playwright workflow runs (ids: …)  
-**Triggers:** heal PR | triage | generation PR | stale report | manual  
+**Triggers:** orchestrator close | heal PR | triage | generation PR | stale report | manual  
+
+## Session log
+
+Most recent orchestrator sessions first (keep last **5** rows; drop older).
+
+| Date | Jira | Confidence | Unknowns | Outcome | PR / notes |
+|------|------|------------|----------|---------|------------|
+| YYYY-MM-DD | AQPBT-n | 8/10 | none | spec green + generation PR | #n, features/AQPBT-n.feature.md |
+
+**Latest session confidence:** N/10 — one-line rationale from the Proposal.
 
 ## Summary
 
@@ -119,6 +150,7 @@ Write or replace at **repo root**:
 | Heal success | | | |
 | Generation-gate pass | | | |
 | Ask vs guess | | | |
+| Session confidence (latest) | N/10 or not recorded | Proposal block this session | |
 
 **Masked regressions (heal):** 0 (or count + PR links)
 
@@ -137,7 +169,7 @@ Write or replace at **repo root**:
 …
 ```
 
-If skipped: do not update the file; output only `eval: skipped — no trigger` unless the user requested a refresh anyway.
+On orchestrator close: commit the refreshed `eval-report.md` when the parent task asked for a commit; otherwise leave the file updated locally and state **Confidence: N/10** in the handoff summary.
 
 ## Related skills
 

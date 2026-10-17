@@ -99,22 +99,23 @@ The **outer runner** (Cursor Automation, headless `agent -p`, or a local batch):
 
 Before closing the session:
 
-1. If any **eval-report trigger** fired this session, apply `eval-report`, commit refreshed `eval-report.md`.
-2. Otherwise note **`eval: skipped`** in the handoff summary.
+1. **Always** apply `eval-report` and refresh `eval-report.md` (include a **Session log** row with **Confidence** from your Proposal, unknowns, outcome, and PR link).
+2. Handoff summary must include **`Confidence: N/10`** (or `not recorded` if no Proposal was emitted) and whether metrics were **full** or **partial** (insufficient CI data is OK; session row is not optional).
+3. Commit `eval-report.md` when the user asked for a commit or the run is backlog / test-generation automation; otherwise update the file and cite the path in the handoff.
 
 ### Single-ticket mode
 
 - Plan in `features/<key>.feature.md` (or `explore-<slug>` for ticket-less).
 - Spec run is **green**, or a **repair PR** is open with heal complete, or a **bug draft** is approved/filed via `bug-reporter`.
 - PR exists when tests were added or healed; human approval pending for merge/bug is expected — not a blocker for marking orchestrator Done.
-- Eval step applied or skipped per above.
+- Eval step **always** applied; handoff includes confidence.
 
 ### Backlog mode
 
 - Exactly **one** ticket processed this run (or queue was empty and run did not start).
 - **Success path:** PR open, ticket linked, `tests-generated` applied, spec green (or heal PR open and green locally).
 - **Failure path:** repeated identical failure — PR may stay open, **no** `tests-generated`, escalate.
-- Eval step applied or skipped per above (end of backlog run counts as a trigger when eval-report skill says so).
+- Eval step **always** applied (backlog close is not optional for eval).
 
 ### Red-run heal mode
 
@@ -122,4 +123,4 @@ Before closing the session:
 - **Drift:** heal PR `heal/<desc>` open, re-run green, assertions unchanged; not merged without approval.
 - **Real bug:** bug filed or draft awaiting approval — no heal.
 - **Ambiguous:** escalated; orchestrator stops without further heal loops.
-- Eval step applied or skipped per above (heal chain triggers eval-report).
+- Eval step **always** applied; record confidence from triage/heal Proposal if ticket-linked.

@@ -1,0 +1,1129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>BuddyApp framework schema — agents, skills, hooks, and workflows</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,560;9..144,650&family=Source+Sans+3:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --paper: #f3f0e8;
+      --ink: #1b2430;
+      --muted: #5c6775;
+      --card: #fffdf8;
+      --line: #e4dccf;
+      --teal: #0d6e68;
+      --teal-soft: #e5f5f3;
+      --green: #1d6b43;
+      --green-soft: #e6f6ee;
+      --amber: #8a5600;
+      --amber-soft: #fff3d8;
+      --red: #9d2c2c;
+      --red-soft: #fdecec;
+      --indigo: #2a3d86;
+      --indigo-soft: #eceffb;
+      --gold: #7a5b22;
+      --gold-soft: #f8f0dc;
+      --slate: #445066;
+      --slate-soft: #eef1f5;
+      --shadow: 0 10px 30px rgba(27, 36, 48, 0.06);
+      --sans: "Source Sans 3", "Segoe UI", sans-serif;
+      --serif: Fraunces, Georgia, serif;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      background:
+        radial-gradient(1200px 500px at 10% -10%, #e7f3f1 0%, transparent 55%),
+        var(--paper);
+      color: var(--ink);
+      font-family: var(--sans);
+      font-size: 18px;
+      line-height: 1.55;
+    }
+
+    a { color: var(--teal); }
+    a:hover { color: var(--ink); }
+    :focus-visible {
+      outline: 3px solid var(--teal);
+      outline-offset: 3px;
+    }
+
+    .wrap {
+      width: min(1180px, calc(100% - 32px));
+      margin: 0 auto;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 240px minmax(0, 1fr);
+      gap: 28px;
+      align-items: start;
+      padding-bottom: 80px;
+    }
+    .layout > main { min-width: 0; }
+
+    .toc {
+      position: sticky;
+      top: 16px;
+      max-height: calc(100vh - 32px);
+      overflow: auto;
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 16px 14px 18px;
+      box-shadow: var(--shadow);
+    }
+    .toc p {
+      margin: 0 0 8px;
+      font-size: 12px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+      font-weight: 700;
+    }
+    .toc ol { list-style: none; margin: 0; padding: 0; }
+    .toc a {
+      display: block;
+      text-decoration: none;
+      color: var(--ink);
+      font-size: 14.5px;
+      padding: 6px 8px;
+      border-radius: 8px;
+      border-left: 3px solid transparent;
+    }
+    .toc a:hover,
+    .toc a.active {
+      background: var(--teal-soft);
+      border-left-color: var(--teal);
+    }
+
+    header.hero { padding: 36px 0 10px; }
+    .kicker {
+      display: inline-block;
+      margin: 0 0 10px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: var(--teal);
+      color: white;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+    h1, h2, h3, h4 { font-family: var(--serif); font-weight: 560; letter-spacing: -0.02em; }
+    h1 { font-size: clamp(36px, 5vw, 56px); line-height: 1.05; margin: 0 0 12px; }
+    h2 { font-size: clamp(28px, 3vw, 36px); margin: 0 0 8px; line-height: 1.15; }
+    h3 { font-size: 22px; margin: 0 0 6px; }
+    h4 { font-size: 18px; margin: 14px 0 6px; }
+    .lede { font-size: 21px; max-width: 68ch; margin: 0 0 16px; }
+    .muted { color: var(--muted); }
+    section { margin: 34px 0; scroll-margin-top: 18px; }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 18px 18px 16px;
+      box-shadow: var(--shadow);
+    }
+    .section-intro { max-width: 72ch; margin: 0 0 14px; }
+
+    .chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 14px 0 0; }
+    .chip {
+      border-radius: 999px;
+      padding: 6px 12px;
+      font-size: 14px;
+      font-weight: 700;
+      background: white;
+      border: 1px solid var(--line);
+    }
+
+    .legend {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      gap: 10px;
+    }
+    .swatch {
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 12px;
+    }
+    .dot {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      flex: 0 0 auto;
+      margin-top: 3px;
+    }
+    .swatch strong { display: block; font-size: 15px; }
+    .swatch span { display: block; color: var(--muted); font-size: 14.5px; }
+    .dot.teal { background: var(--teal); }
+    .dot.green { background: var(--green); }
+    .dot.amber { background: var(--amber); }
+    .dot.red { background: var(--red); }
+    .dot.indigo { background: var(--indigo); }
+    .dot.gold { background: var(--gold); }
+    .dot.slate { background: var(--slate); }
+
+    .teach, .note, .warn, .example {
+      border-radius: 14px;
+      padding: 12px 14px;
+      margin: 12px 0;
+    }
+    .teach { background: var(--amber-soft); border: 1px solid #efd7a4; }
+    .note { background: var(--teal-soft); border: 1px solid #b7e0db; }
+    .warn { background: var(--red-soft); border: 1px solid #f3c7c7; }
+    .example { background: var(--gold-soft); border: 1px solid #ead7ae; }
+    .teach strong, .note strong, .warn strong, .example strong { font-family: var(--serif); }
+
+    .glossary, .grid-3, .grid-2, .agent-grid, .skill-grid {
+      display: grid;
+      gap: 12px;
+    }
+    .glossary { grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); }
+    .grid-3 { grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
+    .grid-2 { grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
+    .agent-grid { grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
+    .agent code, .skill code { overflow-wrap: anywhere; }
+    .skill-grid { grid-template-columns: 1fr; }
+
+    .term, .info, .agent, .skill, .hook {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 14px;
+    }
+    .term h3, .info h3, .agent h3, .skill h3, .hook h3 { font-size: 18px; }
+    .term p, .info p, .agent p, .skill p, .hook p { margin: 6px 0 0; }
+    .label {
+      display: inline-block;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      padding: 3px 8px;
+      border-radius: 999px;
+      margin-bottom: 8px;
+    }
+    .label.teal { background: var(--teal-soft); color: var(--teal); }
+    .label.green { background: var(--green-soft); color: var(--green); }
+    .label.amber { background: var(--amber-soft); color: var(--amber); }
+    .label.red { background: var(--red-soft); color: var(--red); }
+    .label.indigo { background: var(--indigo-soft); color: var(--indigo); }
+    .label.gold { background: var(--gold-soft); color: var(--gold); }
+    .label.slate { background: var(--slate-soft); color: var(--slate); }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: var(--card);
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: var(--shadow);
+      font-size: 16px;
+    }
+    th, td { text-align: left; padding: 10px 12px; vertical-align: top; border-bottom: 1px solid var(--line); }
+    th { background: #f7f4ee; font-size: 13px; letter-spacing: 0.04em; text-transform: uppercase; color: var(--muted); }
+    tr:last-child td { border-bottom: 0; }
+    .scroll { overflow-x: auto; border-radius: 16px; }
+    code {
+      font-family: Consolas, "Courier New", monospace;
+      font-size: 0.92em;
+      background: #efeae1;
+      padding: 1px 5px;
+      border-radius: 5px;
+    }
+
+    .tree {
+      font-family: Consolas, "Courier New", monospace;
+      font-size: 14.5px;
+      line-height: 1.7;
+      background: #1b2430;
+      color: #f4efe6;
+      border-radius: 16px;
+      padding: 16px 18px;
+      overflow-x: auto;
+    }
+    .tree .c { color: #9ad7d1; }
+    .tree .f { color: #f2d48a; }
+    .tree .m { color: #c9b8f0; }
+
+    .pipeline {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(140px, 1fr));
+      gap: 8px;
+      margin-top: 8px;
+    }
+    .step {
+      background: var(--card);
+      border-radius: 16px;
+      padding: 12px;
+      border: 2px solid var(--line);
+      min-height: 150px;
+    }
+    .step .n {
+      font-family: var(--serif);
+      font-size: 28px;
+      line-height: 1;
+      display: block;
+      margin-bottom: 6px;
+    }
+    .step strong { display: block; }
+    .step span { display: block; color: var(--muted); font-size: 14.5px; margin-top: 6px; }
+    .step.read { border-color: var(--slate); background: var(--slate-soft); }
+    .step.write { border-color: var(--indigo); background: var(--indigo-soft); }
+    .step.group { border-color: var(--teal); background: var(--teal-soft); }
+    .step.triage { border-color: var(--amber); background: var(--amber-soft); }
+    .step.draft { border-color: var(--gold); background: var(--gold-soft); }
+    .step.heal { border-color: var(--green); background: var(--green-soft); }
+    .step.stop { border-color: var(--red); background: var(--red-soft); }
+
+    .schema-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: stretch;
+      margin: 8px 0;
+    }
+    .box {
+      border-radius: 14px;
+      padding: 10px 12px;
+      min-width: 150px;
+      border: 2px solid var(--line);
+      background: white;
+      flex: 1 1 150px;
+    }
+    .box b { display: block; font-size: 16px; }
+    .box small { color: var(--muted); display: block; margin-top: 4px; }
+    .box.input { border-color: var(--teal); background: var(--teal-soft); }
+    .box.rule { border-color: var(--amber); background: var(--amber-soft); }
+    .box.score { border-color: var(--indigo); background: var(--indigo-soft); }
+    .box.case { border-color: var(--slate); background: var(--slate-soft); }
+    .box.finding { border-color: var(--gold); background: var(--gold-soft); }
+    .box.human { border-color: var(--red); background: var(--red-soft); }
+    .box.heal { border-color: var(--green); background: var(--green-soft); }
+    .arrow {
+      align-self: center;
+      color: var(--muted);
+      font-weight: 700;
+      font-size: 18px;
+    }
+
+    .fields { display: grid; gap: 6px; margin-top: 10px; }
+    .field {
+      display: grid;
+      grid-template-columns: minmax(7rem, 22%) minmax(5.5rem, 16%) minmax(12rem, 1fr);
+      gap: 10px 12px;
+      align-items: start;
+      font-size: 15px;
+      background: #fbfaf6;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 8px 12px;
+    }
+    .field code { font-weight: 700; color: var(--ink); background: none; padding: 0; }
+    .req { color: var(--red); font-weight: 700; font-size: 12px; letter-spacing: 0.04em; }
+    .opt { color: var(--muted); font-weight: 700; font-size: 12px; letter-spacing: 0.04em; }
+
+    pre {
+      background: #1b2430;
+      color: #f6f1e8;
+      border-radius: 12px;
+      padding: 12px 14px;
+      overflow-x: auto;
+      font-size: 13.5px;
+      line-height: 1.45;
+    }
+    details { margin-top: 10px; }
+    summary { cursor: pointer; font-weight: 700; color: var(--teal); }
+
+    .timeline { list-style: none; margin: 0; padding: 0; }
+    .timeline li {
+      display: grid;
+      grid-template-columns: 42px 1fr;
+      gap: 10px;
+      margin: 0 0 10px;
+    }
+    .timeline .num {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      background: var(--teal);
+      color: white;
+      font-weight: 700;
+    }
+    .timeline .num.amber { background: var(--amber); }
+    .timeline .num.red { background: var(--red); }
+    .timeline .num.green { background: var(--green); }
+    .timeline .num.gold { background: var(--gold); }
+    .timeline .num.indigo { background: var(--indigo); }
+
+    .swim {
+      display: grid;
+      gap: 0;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      overflow: hidden;
+      background: var(--card);
+    }
+    .lane {
+      display: grid;
+      grid-template-columns: 150px 1fr;
+      border-bottom: 1px solid var(--line);
+    }
+    .lane:last-child { border-bottom: 0; }
+    .lane-who {
+      padding: 12px 14px;
+      font-weight: 700;
+      font-size: 14px;
+      background: #f7f4ee;
+      border-right: 1px solid var(--line);
+    }
+    .lane-what { padding: 12px 14px; font-size: 15.5px; }
+
+    .comm-grid {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      gap: 8px;
+      align-items: center;
+      margin: 8px 0;
+    }
+    .comm-from, .comm-to {
+      border-radius: 14px;
+      padding: 10px 12px;
+      border: 2px solid var(--line);
+      background: white;
+    }
+    .comm-mid {
+      text-align: center;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--muted);
+    }
+    .comm-mid span { display: block; font-size: 20px; color: var(--teal); }
+
+    .dl {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 2px;
+      margin: 8px 0 0;
+      font-size: 15.5px;
+    }
+    .dl dt {
+      color: var(--muted);
+      font-weight: 700;
+      font-size: 12px;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      padding-top: 10px;
+    }
+    .dl dd { margin: 0; display: block; }
+    .dl dt { display: block; }
+
+    footer {
+      border-top: 1px solid var(--line);
+      padding: 22px 0 40px;
+      color: var(--muted);
+      font-size: 15px;
+    }
+
+    @media (max-width: 980px) {
+      .layout { grid-template-columns: 1fr; }
+      .toc { position: static; max-height: none; }
+      .pipeline { grid-template-columns: 1fr 1fr; }
+      .lane { grid-template-columns: 1fr; }
+      .lane-who { border-right: 0; border-bottom: 1px solid var(--line); }
+      .field { grid-template-columns: 1fr; }
+      .comm-grid { grid-template-columns: 1fr; }
+      .comm-mid span { transform: rotate(90deg); display: inline-block; }
+    }
+    @media (max-width: 640px) {
+      .pipeline { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <header class="hero">
+    <div class="wrap">
+      <p class="kicker">BuddyApp · QA agent framework</p>
+      <h1>How the pieces work together</h1>
+      <p class="lede">This page is a map of the Playwright test framework in this repo. It shows each agent, skill, hook, and rule, how they talk, and who does what in the main workflows.</p>
+      <p class="muted">Source of truth: files under <code>.cursor/</code>, plus GitHub workflow files. App under test: BuddyTime. Stories live in Jira project AQPBT.</p>
+      <div class="chips">
+        <span class="chip">3 specialist agents</span>
+        <span class="chip">10 skills</span>
+        <span class="chip">2 edit hooks</span>
+        <span class="chip">4 always-on or task rules</span>
+        <span class="chip">orchestrator is a rule, not an agent file</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="wrap">
+    <div class="layout">
+      <nav class="toc" aria-label="On this page">
+        <p>On this page</p>
+        <ol>
+          <li><a href="#layers">1. Four layers</a></li>
+          <li><a href="#tree">2. Where files live</a></li>
+          <li><a href="#talk">3. How they talk</a></li>
+          <li><a href="#rules">4. Rules</a></li>
+          <li><a href="#agents">5. Agents</a></li>
+          <li><a href="#skills">6. Skills</a></li>
+          <li><a href="#hooks">7. Hooks</a></li>
+          <li><a href="#tools">8. Outside tools</a></li>
+          <li><a href="#wf-ticket">9. Ticket to tests</a></li>
+          <li><a href="#wf-explore">10. No ticket</a></li>
+          <li><a href="#wf-red">11. Heal on red</a></li>
+          <li><a href="#wf-backlog">12. Backlog mode</a></li>
+          <li><a href="#wf-other">13. Other workflows</a></li>
+          <li><a href="#gates">14. Human gates</a></li>
+          <li><a href="#walk">15. One full walk</a></li>
+        </ol>
+      </nav>
+
+      <main>
+        <section id="layers">
+          <h2>1. Four layers</h2>
+          <p class="section-intro">The framework is not one program. It is four kinds of instruction that Cursor loads, plus tools that reach Jira, GitHub, and the browser.</p>
+          <div class="legend">
+            <div class="swatch"><i class="dot amber"></i><div><strong>Rules</strong><span>Always in the room, or loaded for a task. They set the law. The QA orchestrator is a rule, not an agent file.</span></div></div>
+            <div class="swatch"><i class="dot gold"></i><div><strong>Skills</strong><span>Step-by-step playbooks. An agent reads a skill and follows it. A skill does not run by itself.</span></div></div>
+            <div class="swatch"><i class="dot indigo"></i><div><strong>Agents</strong><span>Specialist workers the parent can start. They take a handoff, do one job, and report back.</span></div></div>
+            <div class="swatch"><i class="dot red"></i><div><strong>Hooks</strong><span>Automatic gates. They run before a file write. They can block an edit. They do not plan work.</span></div></div>
+          </div>
+
+          <div class="schema-row" style="margin-top:16px;">
+            <div class="box human"><b>You or GitHub Actions</b><small>Start a chat, or run the Test Generation workflow</small></div>
+            <div class="arrow">→</div>
+            <div class="box rule"><b>Parent agent + rules</b><small>Constitution, ESL chat, Playwright style, orchestrator</small></div>
+            <div class="arrow">→</div>
+            <div class="box finding"><b>Skills (playbooks)</b><small>How to analyze, heal, triage, report</small></div>
+            <div class="arrow">→</div>
+            <div class="box score"><b>Specialist agents</b><small>test-writer · triage · bug-reporter</small></div>
+          </div>
+          <div class="schema-row">
+            <div class="box case"><b>MCP + terminal</b><small>Jira, Confluence, GitHub, Playwright browser, <code>npx playwright test</code></small></div>
+            <div class="arrow">→</div>
+            <div class="box human"><b>Hooks on Write</b><small>Block weak assertions and forbidden patterns</small></div>
+            <div class="arrow">→</div>
+            <div class="box heal"><b>Disk artifacts</b><small><code>features/</code> · <code>tests/</code> · <code>pages/</code> · pull requests · Jira bugs</small></div>
+          </div>
+
+          <div class="teach"><strong>The important split.</strong> Skills tell someone <em>how</em>. Agents are <em>who</em> does a bounded job. Hooks are a lock on the door. The orchestrator is the parent Cursor session following <code>qa-orchestrator.mdc</code>. There is no <code>.cursor/agents/orchestrator.md</code> file.</div>
+        </section>
+
+        <section id="tree">
+          <h2>2. Where files live</h2>
+          <p class="section-intro">Every named piece below points at a real path in this repo.</p>
+          <pre class="tree">.cursor/
+  rules/
+    <span class="c">constitution.mdc</span>          always on — non-negotiables
+    <span class="c">esl-communication.mdc</span>    always on — plain English in chat
+    <span class="c">playwright-conventions.mdc</span> tests/** — how to write specs
+    <span class="c">qa-orchestrator.mdc</span>      on demand — plan and delegate
+  agents/
+    <span class="m">test-writer.md</span>            writes tests/ and pages/
+    <span class="m">triage.md</span>                 read-only diagnosis
+    <span class="m">bug-reporter.md</span>           read-only Jira filing
+  skills/
+    jira-ticket-analyzer/SKILL.md
+    explore-and-generate/SKILL.md
+    ci-failure-triage/SKILL.md
+    self-heal/SKILL.md
+    jira-bug-reporter/SKILL.md
+    api-cleanup/SKILL.md
+    pom-conventions/SKILL.md
+    eval-report/SKILL.md
+    exploratory-charter/SKILL.md
+    test-data-reset/SKILL.md + scripts/reset-test-data.ts
+  hooks.json
+  hooks/
+    <span class="f">guard-test-assertions.py</span>
+    <span class="f">guard-constitution.py</span>
+  mcp.json                         Playwright MCP only
+
+features/                          Gherkin plans (handoff to test-writer)
+tests/                             Playwright specs
+pages/                             page objects (locate and act)
+charters/                          exploratory session templates
+eval-report.md                     suite reliability metrics
+.github/workflows/
+  playwright.yml                   run tests on push / pull request
+  test-generation.yml              backlog: start the orchestrator</pre>
+        </section>
+
+        <section id="talk">
+          <h2>3. How they talk</h2>
+          <p class="section-intro">Nothing in this framework calls another piece with an API. Communication is: a parent prompt, a skill file the agent reads, a file on disk, a pull request comment, or a Jira ticket. Hooks speak only by allowing or denying a write.</p>
+
+          <h3>Channels</h3>
+          <div class="scroll">
+            <table>
+              <thead>
+                <tr>
+                  <th>Channel</th>
+                  <th>What it is</th>
+                  <th>Example</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>Parent prompt</strong></td>
+                  <td>The orchestrator (or you) starts a specialist and passes one job.</td>
+                  <td>“Here is <code>features/AQPBT-15.feature.md</code>. Write the spec.”</td>
+                </tr>
+                <tr>
+                  <td><strong>Skill file</strong></td>
+                  <td>The worker opens <code>SKILL.md</code> and follows the steps. The skill is not a subprocess.</td>
+                  <td>triage applies <code>ci-failure-triage</code>.</td>
+                </tr>
+                <tr>
+                  <td><strong>Disk artifact</strong></td>
+                  <td>The next worker reads a file the last worker wrote.</td>
+                  <td>Plan in <code>features/</code> → spec in <code>tests/</code>.</td>
+                </tr>
+                <tr>
+                  <td><strong>Handoff text</strong></td>
+                  <td>The specialist returns a structured report to the parent. It does not keep going.</td>
+                  <td>triage: “Classification: drift. File: <code>pages/…</code>.”</td>
+                </tr>
+                <tr>
+                  <td><strong>MCP / CLI</strong></td>
+                  <td>Talk to systems outside the repo.</td>
+                  <td>Atlassian MCP for Jira. <code>gh</code> for runs and pull requests. Playwright MCP for live UI.</td>
+                </tr>
+                <tr>
+                  <td><strong>Hook JSON</strong></td>
+                  <td>Before <code>Write</code> or <code>StrReplace</code>, a script returns allow or deny.</td>
+                  <td>“Blocked: test assertions weakened…”</td>
+                </tr>
+                <tr>
+                  <td><strong>GitHub Actions prompt</strong></td>
+                  <td>CI starts Cursor CLI <code>agent -p</code> with the orchestrator instructions pasted in.</td>
+                  <td>Test Generation workflow, backlog mode.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h3>Who talks to whom</h3>
+          <div class="comm-grid">
+            <div class="comm-from box input"><b>You / CI</b><small>Ticket key, red run, or “find gaps”</small></div>
+            <div class="comm-mid"><span>→</span>prompt</div>
+            <div class="comm-to box rule"><b>QA orchestrator</b><small>Parent session. Plans. Does not write tests.</small></div>
+          </div>
+          <div class="comm-grid">
+            <div class="comm-from box rule"><b>Orchestrator</b><small>Reads ticket + Confluence</small></div>
+            <div class="comm-mid"><span>→</span>follows skill</div>
+            <div class="comm-to box finding"><b>jira-ticket-analyzer</b><small>Writes <code>features/&lt;KEY&gt;.feature.md</code></small></div>
+          </div>
+          <div class="comm-grid">
+            <div class="comm-from box rule"><b>Orchestrator</b><small>Delegates (max 3 times)</small></div>
+            <div class="comm-mid"><span>→</span>subagent</div>
+            <div class="comm-to box score"><b>test-writer</b><small>Writes <code>tests/</code> and <code>pages/</code>, then runs the spec</small></div>
+          </div>
+          <div class="comm-grid">
+            <div class="comm-from box score"><b>test-writer</b><small>While writing</small></div>
+            <div class="comm-mid"><span>→</span>reads skills</div>
+            <div class="comm-to box finding"><b>pom-conventions + api-cleanup</b><small>Plus rule <code>playwright-conventions.mdc</code></small></div>
+          </div>
+          <div class="comm-grid">
+            <div class="comm-from box score"><b>Any writer</b><small><code>Write</code> / <code>StrReplace</code></small></div>
+            <div class="comm-mid"><span>→</span>preToolUse</div>
+            <div class="comm-to box human"><b>Two hooks</b><small>Allow, or deny and stop the edit</small></div>
+          </div>
+          <div class="comm-grid">
+            <div class="comm-from box rule"><b>Orchestrator</b><small>Suite is red</small></div>
+            <div class="comm-mid"><span>→</span>subagent (read-only)</div>
+            <div class="comm-to box case"><b>triage</b><small>Applies ci-failure-triage. Returns one label.</small></div>
+          </div>
+          <div class="comm-grid">
+            <div class="comm-from box case"><b>triage says drift</b><small>Locator / copy changed</small></div>
+            <div class="comm-mid"><span>→</span>parent follows skill</div>
+            <div class="comm-to box heal"><b>self-heal</b><small>Patch one locator in <code>pages/</code>. Open <code>heal/…</code> pull request.</small></div>
+          </div>
+          <div class="comm-grid">
+            <div class="comm-from box case"><b>triage says real app bug</b><small>App contradicts the story</small></div>
+            <div class="comm-mid"><span>→</span>subagent (read-only)</div>
+            <div class="comm-to box score"><b>bug-reporter</b><small>Applies jira-bug-reporter. Draft first. File only after you say yes.</small></div>
+          </div>
+
+          <div class="note"><strong>Direction of work.</strong> Specialists never call each other. Only the parent (orchestrator or you) starts them. triage never heals. test-writer never files Jira. bug-reporter never edits the repo. self-heal never changes assertions.</div>
+        </section>
+
+        <section id="rules">
+          <h2>4. Rules</h2>
+          <p class="section-intro">Rules sit in <code>.cursor/rules/</code>. They shape every answer. Skills and agents must still obey them.</p>
+          <div class="agent-grid">
+            <article class="agent">
+              <span class="label amber">Always on</span>
+              <h3>constitution.mdc</h3>
+              <p>The law for this repo. Must / Should / Won’t tables. Role locators, web-first <code>expect</code>, storage-state login, unique data, one tag per test. Forbids XPath, <code>waitForTimeout</code>, hardcoded secrets, the <code>any</code> type, weakened assertions, healing a real product bug, tags on <code>describe</code>, and a classic BasePage.</p>
+              <p>Also lists every skill and agent, and the <strong>Audit → Proposal → Edit</strong> gate for non-trivial work. Confidence under 5: stop. 5–7: wait for you. 8+: proceed and cite evidence. Never invent routes, labels, or env names.</p>
+            </article>
+            <article class="agent">
+              <span class="label amber">Always on</span>
+              <h3>esl-communication.mdc</h3>
+              <p>How the agent talks to you in chat, tables, and pull request text: short sentences, common words, full phrase before a short form. Does not change code comments or variable names.</p>
+            </article>
+            <article class="agent">
+              <span class="label teal">When editing tests/</span>
+              <h3>playwright-conventions.mdc</h3>
+              <p>Day-to-day how-to for specs: locators, waiting, page objects, auth, data, tags, factories, API setup, mocking, accessibility, assertions, anti-flake. Hard stops match the constitution. Applied by glob <code>tests/**</code>.</p>
+            </article>
+            <article class="agent">
+              <span class="label indigo">On demand</span>
+              <h3>qa-orchestrator.mdc</h3>
+              <p>The coordinator. <strong>Plans and delegates.</strong> Never writes test code and never files bugs itself. Reads the ticket (and Confluence). Produces the plan. Sends work to test-writer, triage, and bug-reporter. Caps: 3 delegations, 2 identical failing re-runs, 5 heals. Always triage before heal. Mandatory eval-report before Done when a trigger fired.</p>
+            </article>
+          </div>
+        </section>
+
+        <section id="agents">
+          <h2>5. Agents</h2>
+          <p class="section-intro">Three specialists in <code>.cursor/agents/</code>. Cursor can start them as subagents. The parent must give them a finished input. They return a result. They do not run the whole pipeline alone.</p>
+          <div class="agent-grid">
+            <article class="agent">
+              <span class="label indigo">Writes files</span>
+              <h3>test-writer</h3>
+              <p><code>.cursor/agents/test-writer.md</code></p>
+              <dl class="dl">
+                <dt>When</dt><dd>A plan is ready and tests need to be written.</dd>
+                <dt>In</dt><dd>A Gherkin or plain plan, usually <code>features/&lt;key&gt;.feature.md</code>, plus page context. No plan → stop and ask the parent.</dd>
+                <dt>Out</dt><dd>A spec under <code>tests/</code>. New page-object methods under <code>pages/</code> only if the plan needs a new action.</dd>
+                <dt>Skills</dt><dd>pom-conventions, api-cleanup, plus rule playwright-conventions.</dd>
+                <dt>Must</dt><dd>Run the spec once. Never report success without a run.</dd>
+                <dt>Won’t</dt><dd>Edit application source. Weaken assertions. Write outside <code>tests/</code> and <code>pages/</code>. Merge without you.</dd>
+              </dl>
+            </article>
+            <article class="agent">
+              <span class="label slate">Read only</span>
+              <h3>triage</h3>
+              <p><code>.cursor/agents/triage.md</code></p>
+              <dl class="dl">
+                <dt>When</dt><dd>A build or local spec fails. Always first on red.</dd>
+                <dt>In</dt><dd>Failed run id or URL, or a failing local spec.</dd>
+                <dt>Out</dt><dd>Root cause, failing test, trace path, file. Exactly one label: <strong>test issue (drift)</strong> | <strong>real app bug</strong> | <strong>ambiguous</strong>.</dd>
+                <dt>Skills</dt><dd>ci-failure-triage (required).</dd>
+                <dt>Must</dt><dd>Hand the diagnosis back to the parent. Post the same block as a pull request comment when a pull request exists.</dd>
+                <dt>Won’t</dt><dd>Edit, merge, or fix. Propose only.</dd>
+              </dl>
+            </article>
+            <article class="agent">
+              <span class="label gold">Read only · Jira</span>
+              <h3>bug-reporter</h3>
+              <p><code>.cursor/agents/bug-reporter.md</code></p>
+              <dl class="dl">
+                <dt>When</dt><dd>Triage already said real app bug.</dd>
+                <dt>In</dt><dd>That diagnosis.</dd>
+                <dt>Out</dt><dd>A Jira bug key in AQPBT, linked to the story — after you approve the draft.</dd>
+                <dt>Skills</dt><dd>jira-bug-reporter.</dd>
+                <dt>Must</dt><dd>Show the draft. Wait. Then file and report the key.</dd>
+                <dt>Won’t</dt><dd>File on a test issue or a green run. Touch repo files.</dd>
+              </dl>
+            </article>
+          </div>
+          <div class="warn"><strong>Not an agent file.</strong> The QA orchestrator is a rule. In GitHub Actions it is the Cursor CLI session told “You are the QA orchestrator.” In chat, the same parent agent follows that rule when you ask to run a ticket or a red build end to end.</div>
+        </section>
+
+        <section id="skills">
+          <h2>6. Skills</h2>
+          <p class="section-intro">Ten playbooks in <code>.cursor/skills/</code>. Who uses them: the orchestrator, a specialist, or you in chat. Each skill has a clear output path.</p>
+
+          <article class="skill" id="sk-analyzer">
+            <span class="label teal">Plan · with ticket</span>
+            <h3>jira-ticket-analyzer</h3>
+            <p>Turns a Jira ticket’s acceptance criteria into reviewable Gherkin. Used whenever you name a ticket like AQPBT-15 and ask for a plan — even if you do not say “Gherkin”.</p>
+            <dl class="dl">
+              <dt>Who</dt><dd>Orchestrator (first step with a ticket). You in chat.</dd>
+              <dt>Reads</dt><dd>Atlassian MCP: full Jira issue (every acceptance criterion). Linked Confluence page in space AQPBT.</dd>
+              <dt>Writes</dt><dd><code>features/&lt;ticket-key&gt;.feature.md</code></dd>
+              <dt>Does</dt><dd>One Feature per ticket. Every acceptance criterion → at least one Scenario. Adds negative and edge cases. Real UI strings, not placeholders. Ends with an “Ambiguities and gaps” comment.</dd>
+              <dt>Stops</dt><dd>After the feature file, unless you ask for Playwright next. Does not invent acceptance criteria to match the live app.</dd>
+            </dl>
+          </article>
+
+          <article class="skill" id="sk-explore">
+            <span class="label teal">Plan · no ticket</span>
+            <h3>explore-and-generate</h3>
+            <p>Finds one untested user flow by comparing live UI to existing specs. Ticket-less only. If a ticket exists, use jira-ticket-analyzer instead.</p>
+            <dl class="dl">
+              <dt>Who</dt><dd>Orchestrator (no-ticket path). You in chat.</dd>
+              <dt>Reads</dt><dd><code>tests/</code>, <code>pages/</code>, live app via Playwright MCP (<code>browser_navigate</code> + <code>browser_snapshot</code> only).</dd>
+              <dt>Writes</dt><dd><code>features/explore-&lt;page&gt;-&lt;flow&gt;.feature.md</code></dd>
+              <dt>Does</dt><dd>Map coverage → crawl page (read-only) → list flows → pick one gap → two Gherkin scenarios (happy + edge) → locator hints for test-writer.</dd>
+              <dt>Won’t</dt><dd>Write or run specs. Submit forms that persist data. Take screenshots. Process more than one flow per run.</dd>
+            </dl>
+          </article>
+
+          <article class="skill" id="sk-triage">
+            <span class="label amber">Diagnose</span>
+            <h3>ci-failure-triage</h3>
+            <p>Turns a red continuous integration (CI) run or local failure into one classification. The triage agent must apply this skill.</p>
+            <dl class="dl">
+              <dt>Who</dt><dd>triage agent. Orchestrator on red. You when a build fails.</dd>
+              <dt>Reads</dt><dd>GitHub MCP or <code>gh</code> logs and playwright-report artifact; or local <code>test-results/</code>. Spec, page object, Gherkin, Confluence. Not BuddyTime source — it is not in this repo.</dd>
+              <dt>Writes</dt><dd>A pull request comment, or the same markdown block back to the parent. No code edits.</dd>
+              <dt>Labels</dt><dd><strong>drift</strong> → later self-heal. <strong>real app bug</strong> → later bug-reporter. <strong>ambiguous</strong> → stop and ask you.</dd>
+            </dl>
+          </article>
+
+          <article class="skill" id="sk-heal">
+            <span class="label green">Repair locators</span>
+            <h3>self-heal</h3>
+            <p>Fixes one broken locator after triage said drift. Specs and assertions stay the same.</p>
+            <dl class="dl">
+              <dt>Who</dt><dd>Orchestrator after a drift label. Not used for real product bugs.</dd>
+              <dt>Reads</dt><dd>Error, trace (read-only on <code>tests/</code>), live UI snapshot at the failing step.</dd>
+              <dt>Writes</dt><dd>One locator in <code>pages/</code> (or <code>pages/components/</code>). Branch <code>heal/&lt;short-description&gt;</code>. Pull request, not merged.</dd>
+              <dt>Verify</dt><dd>Re-run the same failing test. Must pass with zero changes under <code>tests/</code>.</dd>
+              <dt>Stops</dt><dd>If an assertion must change; if the same locator error remains; if a new failure looks like a product bug; if the fail is flake/timeout without a label change. Max 5 heals per red run (orchestrator cap).</dd>
+            </dl>
+          </article>
+
+          <article class="skill" id="sk-bug">
+            <span class="label red">File a defect</span>
+            <h3>jira-bug-reporter</h3>
+            <p>Turns a confirmed product defect into a Jira draft, then a ticket after you approve.</p>
+            <dl class="dl">
+              <dt>Who</dt><dd>bug-reporter agent. Never from self-heal. Never for drift.</dd>
+              <dt>Reads</dt><dd>Failure, artifacts, Gherkin, live app. Searches AQPBT for duplicates first.</dd>
+              <dt>Writes</dt><dd>Chat draft (always). Jira bug + link to the story (only after you say yes). No repo files.</dd>
+              <dt>Won’t</dt><dd>File on flake that passes on retry, test bugs, missing env, or behavior already marked as an ambiguity in the feature file.</dd>
+            </dl>
+          </article>
+
+          <article class="skill" id="sk-pom">
+            <span class="label indigo">While writing tests</span>
+            <h3>pom-conventions</h3>
+            <p>Page Object Model rules. Specs assert. <code>pages/</code> locate and act. No inline locators in tests. Path hint: <code>tests/**</code>, <code>pages/**</code>.</p>
+            <dl class="dl">
+              <dt>Who</dt><dd>test-writer on every spec. Orchestrator checks that generated page objects match.</dd>
+              <dt>Writes</dt><dd>Nothing by itself. Constrains how test-writer writes classes under <code>pages/</code>.</dd>
+              <dt>Inventory</dt><dd>Lists every BuddyTime page object and component that exists today (landing, login, dashboard, birthdays, communities, and so on).</dd>
+            </dl>
+          </article>
+
+          <article class="skill" id="sk-api">
+            <span class="label indigo">While writing tests</span>
+            <h3>api-cleanup</h3>
+            <p>Every test that creates a record must track it so teardown can delete it. Shared BuddyTime env must not fill up with leftover parties.</p>
+            <dl class="dl">
+              <dt>Who</dt><dd>test-writer whenever a spec creates data.</dd>
+              <dt>Writes</dt><dd>Nothing by itself. Tells the spec to import <code>fixtures/cleanup.fixture</code> and call <code>trackRecord</code>.</dd>
+              <dt>Runtime</dt><dd>UI creates of birthday events are auto-tracked on <code>POST /api/v1/events</code> → 201. Teardown: <code>support/global-teardown.ts</code> and <code>support/cleanup-reporter.ts</code>.</dd>
+              <dt>Types today</dt><dd>Only <code>birthday-event</code>. New types need RecordType + api-client + this skill in the same change.</dd>
+            </dl>
+          </article>
+
+          <article class="skill" id="sk-eval">
+            <span class="label slate">Close the session</span>
+            <h3>eval-report</h3>
+            <p>Refreshes suite reliability numbers in <code>eval-report.md</code>. Report only. No tickets, no test edits. Cursor has no built-in telemetry — this skill says how to count by hand.</p>
+            <dl class="dl">
+              <dt>Who</dt><dd>Orchestrator before Done, if a trigger fired. You when you ask for suite health.</dd>
+              <dt>Triggers</dt><dd>Heal pull request or red-run triage; generation pull request; file missing or older than 14 days.</dd>
+              <dt>Writes</dt><dd><code>eval-report.md</code> at repo root — or replies <code>eval: skipped — no trigger</code>.</dd>
+              <dt>Metrics</dt><dd>Flake rate, heal success, generation-gate pass, ask versus guess. Missing data → write “insufficient data”, never guess.</dd>
+            </dl>
+          </article>
+
+          <article class="skill" id="sk-charter">
+            <span class="label gold">Human exploration</span>
+            <h3>exploratory-charter</h3>
+            <p>Empty session charter + findings table. You supply risks and observations. The agent does not invent them.</p>
+            <dl class="dl">
+              <dt>Who</dt><dd>You, when you want a time-boxed explore before or after clicking the app.</dd>
+              <dt>Needs</dt><dd>Feature name and risk. If either is missing, stop and ask.</dd>
+              <dt>Writes</dt><dd><code>charters/&lt;feature-slug&gt;.md</code> only.</dd>
+              <dt>Won’t</dt><dd>Write specs, file bugs, run Playwright, or crawl for coverage gaps (that is explore-and-generate).</dd>
+            </dl>
+          </article>
+
+          <article class="skill" id="sk-reset">
+            <span class="label red">Manual cleanup</span>
+            <h3>test-data-reset</h3>
+            <p>Deletes only records listed in the tracker after a run stopped early. Flag <code>disable-model-invocation: true</code> — the agent must not start this on its own.</p>
+            <dl class="dl">
+              <dt>Who</dt><dd>You, when you explicitly ask to reset leftover test data.</dd>
+              <dt>Reads</dt><dd><code>.test-artifacts/created-records.jsonl</code></dd>
+              <dt>Runs</dt><dd><code>npx tsx .cursor/skills/test-data-reset/scripts/reset-test-data.ts</code> — dry-run first, then real delete after you confirm.</dd>
+              <dt>Won’t</dt><dd>Delete anything not in the tracker. Run in CI. Replace normal teardown.</dd>
+            </dl>
+          </article>
+        </section>
+
+        <section id="hooks">
+          <h2>7. Hooks</h2>
+          <p class="section-intro">Hooks are the only piece that can stop an edit without asking. Config: <code>.cursor/hooks.json</code>. Event: <code>preToolUse</code>. Matcher: <code>Write|StrReplace</code>. Both are <code>failClosed: true</code> — if the script crashes, the edit is blocked.</p>
+
+          <div class="grid-2">
+            <article class="hook">
+              <span class="label red">Gate</span>
+              <h3>guard-test-assertions.py</h3>
+              <p>Watches spec files under <code>tests/</code> (<code>.spec.ts</code>, <code>.test.ts</code>, and JS/JSX twins).</p>
+              <p>Counts active <code>expect(</code> calls. Ignores commented lines. If the new file has fewer expects than the old file, the write is denied.</p>
+              <p>Message: do not delete or comment out assertions to make tests pass. Fix the app, the locator, or the test data.</p>
+            </article>
+            <article class="hook">
+              <span class="label red">Gate</span>
+              <h3>guard-constitution.py</h3>
+              <p>Watches <code>tests/</code> and <code>pages/</code> TypeScript/JavaScript files.</p>
+              <p>Blocks an edit that <em>adds</em> a forbidden pattern: <code>.waitForTimeout(</code>, XPath <code>locator('//…')</code>, the <code>any</code> type, a hardcoded email in <code>.fill()</code>, a hardcoded password/secret/token, or a tag on <code>test.describe()</code>.</p>
+              <p>On spec files it also blocks a drop in <code>expect(</code> count (second line of defense).</p>
+            </article>
+          </div>
+
+          <div class="note" style="margin-top:14px;"><strong>How a hook talks.</strong> Cursor sends JSON on standard input (tool name + proposed contents). The script prints JSON: <code>permission: allow</code> or <code>permission: deny</code> plus a message to you and to the agent. The agent sees the deny and must change the plan. It cannot “heal” by deleting the failing expect.</div>
+          <div class="teach"><strong>What hooks do not do.</strong> They do not start workflows. They do not classify red runs. They do not know Jira. Shell wrappers (<code>.sh</code>) exist so the same Python can run on Unix. On this Windows machine, <code>hooks.json</code> calls <code>python .cursor/hooks/…py</code> directly.</div>
+        </section>
+
+        <section id="tools">
+          <h2>8. Outside tools</h2>
+          <p class="section-intro">Agents reach the world through MCP servers and the terminal. These are not agents, but every workflow uses them.</p>
+          <div class="scroll">
+            <table>
+              <thead>
+                <tr>
+                  <th>Tool</th>
+                  <th>Where it is configured</th>
+                  <th>Who uses it</th>
+                  <th>For what</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>Atlassian MCP</strong></td>
+                  <td>Cursor Settings → MCP (signed-in). Not in <code>.cursor/mcp.json</code>.</td>
+                  <td>Orchestrator, ticket analyzer, bug-reporter, triage (Confluence)</td>
+                  <td>Read Jira and Confluence. Create bugs after approval. Add label <code>tests-generated</code>.</td>
+                </tr>
+                <tr>
+                  <td><strong>GitHub MCP or <code>gh</code></strong></td>
+                  <td>Cursor Settings, or CLI with <code>GITHUB_TOKEN</code> in Actions</td>
+                  <td>triage, self-heal, eval-report, Test Generation</td>
+                  <td>Run logs, artifacts, pull requests, comments, checks.</td>
+                </tr>
+                <tr>
+                  <td><strong>Playwright MCP</strong></td>
+                  <td><code>.cursor/mcp.json</code> → <code>npx @playwright/mcp</code></td>
+                  <td>explore-and-generate, self-heal, sometimes bug-reporter</td>
+                  <td>Live accessibility snapshot. Re-discover a locator. Map untested flows.</td>
+                </tr>
+                <tr>
+                  <td><strong>Terminal Playwright</strong></td>
+                  <td><code>npx playwright test</code> / npm scripts</td>
+                  <td>test-writer (must run once), self-heal verify, bug-reporter reproduce, you</td>
+                  <td>Prove the spec. Auth setup writes <code>playwright/.auth/</code>.</td>
+                </tr>
+                <tr>
+                  <td><strong>Playwright workflow</strong></td>
+                  <td><code>.github/workflows/playwright.yml</code></td>
+                  <td>GitHub on push, pull request, or manual run</td>
+                  <td>Install, run <code>npx playwright test</code>, upload the HTML report artifact.</td>
+                </tr>
+                <tr>
+                  <td><strong>Test Generation workflow</strong></td>
+                  <td><code>.github/workflows/test-generation.yml</code></td>
+                  <td>Weekdays 14:00 UTC, or manual with optional Jira key</td>
+                  <td>Starts Cursor CLI as the orchestrator for one backlog ticket.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="example"><strong>Local npm scripts</strong> (from <code>package.json</code>): <code>test:smoke</code>, <code>test:sanity</code>, <code>test:regression</code>, <code>test:api</code>, <code>test:e2e</code>, <code>test:destructive</code> (one worker). Tags on each <code>test()</code> are how you select a slice. The GitHub Playwright workflow currently runs the full <code>npx playwright test</code> command.</div>
+        </section>
+
+        <section id="wf-ticket">
+          <h2>9. Main workflow — ticket to tests</h2>
+          <p class="section-intro">This is the happy path when you (or backlog mode) have a Jira key. The orchestrator plans. Specialists write. Hooks watch the writes.</p>
+          <div class="pipeline">
+            <div class="step read"><span class="n">1</span><strong>Read</strong><span>Orchestrator + Atlassian MCP. Jira issue and linked Confluence page.</span></div>
+            <div class="step group"><span class="n">2</span><strong>Plan</strong><span>Skill jira-ticket-analyzer. File: <code>features/AQPBT-n.feature.md</code>.</span></div>
+            <div class="step write"><span class="n">3</span><strong>Write</strong><span>Agent test-writer. Spec in <code>tests/</code>, actions in <code>pages/</code>. Hooks may deny.</span></div>
+            <div class="step triage"><span class="n">4</span><strong>Run</strong><span>test-writer runs the spec. Orchestrator may run a wider slice.</span></div>
+            <div class="step draft"><span class="n">5</span><strong>Handoff</strong><span>Green → pull request. Red → Heal on red (section 11). Then eval-report if triggered.</span></div>
+          </div>
+
+          <div class="swim" style="margin-top:16px;">
+            <div class="lane"><div class="lane-who">You</div><div class="lane-what">Give a ticket key. Later approve the pull request (and any bug). You merge. The agent never merges.</div></div>
+            <div class="lane"><div class="lane-who">Orchestrator</div><div class="lane-what">Reads the ticket. Runs the analyzer skill. Saves the plan. Starts test-writer. If red, starts triage. Routes heal vs bug. Asks for eval-report at the end.</div></div>
+            <div class="lane"><div class="lane-who">jira-ticket-analyzer</div><div class="lane-what">Playbook only. Writes Gherkin to <code>features/</code>. Stops for review unless you already asked for implementation.</div></div>
+            <div class="lane"><div class="lane-who">test-writer</div><div class="lane-what">Reads the plan + existing page objects. Follows pom-conventions and api-cleanup. Writes spec and POM methods. Runs once. Reports path + result.</div></div>
+            <div class="lane"><div class="lane-who">Hooks</div><div class="lane-what">On every Write/StrReplace to tests or pages: block weaker expects and constitution violations.</div></div>
+            <div class="lane"><div class="lane-who">Disk</div><div class="lane-what"><code>features/AQPBT-n.feature.md</code> → <code>tests/aqpbt-n-….spec.ts</code> → <code>pages/….page.ts</code>. Optional pull request branch <code>tests/&lt;key&gt;-&lt;slug&gt;</code> in backlog mode.</div></div>
+          </div>
+        </section>
+
+        <section id="wf-explore">
+          <h2>10. Main workflow — no ticket</h2>
+          <p class="section-intro">Same parent, different first skill. Discovery is read-only. Automation still goes through test-writer after you accept the plan.</p>
+          <ol class="timeline">
+            <li><span class="num">1</span><div class="card"><strong>Orchestrator applies explore-and-generate.</strong> Maps what specs already cover. Opens the live page with Playwright MCP. No screenshots. No submits that save data.</div></li>
+            <li><span class="num">2</span><div class="card"><strong>One gap is chosen.</strong> Two Gherkin scenarios. Locator hints. Suggested spec path. Suggested Jira story text (not filed here).</div></li>
+            <li><span class="num">3</span><div class="card"><strong>File:</strong> <code>features/explore-&lt;page&gt;-&lt;flow&gt;.feature.md</code>. You review.</div></li>
+            <li><span class="num indigo">4</span><div class="card"><strong>Delegate test-writer</strong> with that plan — same as the ticket path from step 3 onward.</div></li>
+          </ol>
+          <div class="teach"><strong>Do not mix paths.</strong> A ticket with acceptance criteria always uses jira-ticket-analyzer. explore-and-generate is only when there is no ticket.</div>
+        </section>
+
+        <section id="wf-red">
+          <h2>11. Main workflow — heal on red</h2>
+          <p class="section-intro">Always classify first. Healing a real product bug is forbidden. The constitution, orchestrator, self-heal skill, and bug-reporter skill all say the same thing.</p>
+          <div class="schema-row">
+            <div class="box case"><b>Red run</b><small>CI or local spec</small></div>
+            <div class="arrow">→</div>
+            <div class="box rule"><b>Orchestrator</b><small>Starts triage. Does not patch yet.</small></div>
+            <div class="arrow">→</div>
+            <div class="box finding"><b>triage + ci-failure-triage</b><small>One label only</small></div>
+          </div>
+          <div class="schema-row">
+            <div class="box heal"><b>Drift</b><small>self-heal: one locator in pages/. Re-run same test. Pull request heal/… Assertions unchanged.</small></div>
+            <div class="box human"><b>Real app bug</b><small>bug-reporter + jira-bug-reporter. Draft in chat. File in AQPBT after you approve. Link the story. No heal.</small></div>
+            <div class="box rule"><b>Ambiguous</b><small>Stop. List unknowns. Ask you. No more heal loops.</small></div>
+          </div>
+
+          <div class="swim" style="margin-top:14px;">
+            <div class="lane"><div class="lane-who">triage</div><div class="lane-what">Read-only. Pulls logs and the report artifact. Reads spec, POM, Gherkin, Confluence. Returns classification + file:line + suggested next step.</div></div>
+            <div class="lane"><div class="lane-who">self-heal</div><div class="lane-what">Only after drift. Snapshot the live control. Patch POM. Hooks still apply. Open pull request. Do not merge. Do not file Jira.</div></div>
+            <div class="lane"><div class="lane-who">bug-reporter</div><div class="lane-what">Only after real app bug. Re-run once (pass on retry → flake, do not file). Search duplicates. Draft. Wait. File. Return the key.</div></div>
+            <div class="lane"><div class="lane-who">Hooks</div><div class="lane-what">If someone tries to go green by deleting <code>expect(</code>, the write is denied. That is how “never weaken assertions” is enforced, not only written.</div></div>
+          </div>
+
+          <div class="warn"><strong>Hard stops.</strong> Same locator error after heal attempts → stop. Green only if an assertion changes → stop (not drift). Same spec failed identically twice → escalate. Never merge, close a ticket, or close a pull request without you.</div>
+        </section>
+
+        <section id="wf-backlog">
+          <h2>12. Main workflow — backlog mode</h2>
+          <p class="section-intro">An outer runner processes <strong>one</strong> Jira ticket per run. The runner is GitHub Actions (Test Generation) or a local/headless <code>agent -p</code>. The inner loop is the same ticket path as section 9.</p>
+
+          <ol class="timeline">
+            <li><span class="num">1</span><div class="card"><strong>Queue.</strong> Project <code>JIRA_PROJECT_KEY</code> (AQPBT). Status <strong>In QA</strong>. Label <code>tests-generated</code> is absent. At most one issue. Empty queue → stop, no pull request.</div></li>
+            <li><span class="num">2</span><div class="card"><strong>Manual dispatch override.</strong> If you pass <code>jira_key</code> into the workflow, process only that issue. If it is missing, wrong project, or already labeled, stop.</div></li>
+            <li><span class="num indigo">3</span><div class="card"><strong>Per ticket:</strong> analyzer → commit the feature file → test-writer → run the new spec → heal on red (triage first).</div></li>
+            <li><span class="num green">4</span><div class="card"><strong>Success output:</strong> one pull request, ticket linked in the body, Gherkin path named, branch <code>tests/&lt;key&gt;-&lt;slug&gt;</code>. If the spec is green, add label <code>tests-generated</code>.</div></li>
+            <li><span class="num red">5</span><div class="card"><strong>Failure output:</strong> repeated identical failure. Pull request may stay open. Do <strong>not</strong> add <code>tests-generated</code>. Escalate.</div></li>
+            <li><span class="num gold">6</span><div class="card"><strong>Done:</strong> eval-report skill. Never merge, never transition Jira, never close the pull request.</div></li>
+          </ol>
+
+          <div class="note"><strong>Where this lives.</strong> Policy: <code>.cursor/rules/qa-orchestrator.mdc</code> (Backlog mode). Automation: <code>.github/workflows/test-generation.yml</code> (cron Monday–Friday 14:00 UTC, concurrency group <code>test-generation</code>). Write scope in that prompt: <code>features/</code>, <code>tests/</code>, <code>pages/</code>, <code>test-data/</code>, <code>eval-report.md</code>.</div>
+        </section>
+
+        <section id="wf-other">
+          <h2>13. Other workflows</h2>
+          <div class="grid-2">
+            <article class="info">
+              <span class="label gold">Charter</span>
+              <h3>Exploratory session</h3>
+              <p><strong>Who:</strong> you + exploratory-charter skill. Not the orchestrator loop.</p>
+              <p><strong>Where:</strong> <code>charters/&lt;slug&gt;.md</code>.</p>
+              <p><strong>Flow:</strong> you name feature + risk → agent fills only non-judgment fields → you explore and write findings → if a real bug is confirmed, then bug-reporter (separate).</p>
+            </article>
+            <article class="info">
+              <span class="label slate">Metrics</span>
+              <h3>Eval report</h3>
+              <p><strong>Who:</strong> orchestrator at session close, or you.</p>
+              <p><strong>Where:</strong> <code>eval-report.md</code>.</p>
+              <p><strong>Flow:</strong> check triggers → <code>gh run list</code> / pull request history / transcripts → fill the four metrics or “insufficient data” → one reliability risk + one next action.</p>
+            </article>
+            <article class="info">
+              <span class="label red">Ops</span>
+              <h3>Reset leftover data</h3>
+              <p><strong>Who:</strong> only you, explicit ask.</p>
+              <p><strong>Where:</strong> tracker file + api-client deletes.</p>
+              <p><strong>Flow:</strong> dry-run list → you confirm → script deletes tracker rows only (today: birthday-event). 404 on delete counts as cleaned, not as flake.</p>
+            </article>
+            <article class="info">
+              <span class="label teal">CI tests</span>
+              <h3>Playwright GitHub job</h3>
+              <p><strong>Who:</strong> GitHub Actions, not an agent.</p>
+              <p><strong>Where:</strong> <code>playwright.yml</code>.</p>
+              <p><strong>Flow:</strong> checkout → Node 20 → <code>npm ci</code> → Chromium → <code>npx playwright test</code> → upload <code>playwright-report/</code>. If this job is red, a person or the orchestrator starts triage.</p>
+            </article>
+          </div>
+        </section>
+
+        <section id="gates">
+          <h2>14. Human gates and loop limits</h2>
+          <p class="section-intro">The framework is allowed to plan, write tests, open pull requests, and draft bugs. A person still owns merge, filing, and “this is a real defect.”</p>
+          <div class="grid-2">
+            <article class="card">
+              <h3>You must approve</h3>
+              <ul>
+                <li>Every merge</li>
+                <li>Every Jira bug before it is created</li>
+                <li>test-data-reset after the dry-run</li>
+                <li>Overwriting an existing charter file</li>
+                <li>Work with confidence 5–7 (unknowns listed)</li>
+                <li>Closing a ticket or a pull request</li>
+              </ul>
+            </article>
+            <article class="card">
+              <h3>Automatic stops</h3>
+              <ul>
+                <li>At most <strong>3</strong> delegations per task (heal retries extra)</li>
+                <li>Never re-run the <strong>same failing spec</strong> more than twice</li>
+                <li>At most <strong>5</strong> heals per red run</li>
+                <li>Identical failure twice → escalate, no <code>tests-generated</code></li>
+                <li>Confidence &lt; 5 → stop and ask</li>
+                <li>Hooks deny a write that weakens expects or adds a Won’t pattern</li>
+              </ul>
+            </article>
+          </div>
+          <div class="example"><strong>Audit → Proposal → Edit</strong> (constitution, behavioral, not a hook). Before a non-trivial change the parent must list scope, confidence 1–10, why, and unknowns — then wait unless confidence is 8 or higher. Trivial = a one-line fix with obvious intent.</div>
+        </section>
+
+        <section id="walk">
+          <h2>15. One full walk, from ticket to done</h2>
+          <p class="section-intro">Example: story AQPBT-15 (profile details). This is the same travel the orchestrator is built for.</p>
+          <ol class="timeline">
+            <li><span class="num">1</span><div class="card"><strong>You or Test Generation</strong> pass <code>AQPBT-15</code> (or the queue picks it: In QA, no <code>tests-generated</code>).</div></li>
+            <li><span class="num">2</span><div class="card"><strong>Orchestrator</strong> loads constitution + qa-orchestrator. Reads the Jira issue and the Confluence page through Atlassian MCP.</div></li>
+            <li><span class="num">3</span><div class="card"><strong>jira-ticket-analyzer</strong> writes <code>features/AQPBT-15.feature.md</code> with AC-mapped scenarios, negatives, edges, and an ambiguity footer. Disk is now the handoff.</div></li>
+            <li><span class="num indigo">4</span><div class="card"><strong>test-writer</strong> reads that file and <code>pages/profile.page.ts</code>. Follows pom-conventions and api-cleanup. Writes <code>tests/aqpbt-15-profile-your-details.spec.ts</code>. Each <code>Write</code> hits both hooks.</div></li>
+            <li><span class="num indigo">5</span><div class="card"><strong>test-writer</strong> runs <code>npx playwright test</code> on that spec and reports pass or fail. Never claims success without this run.</div></li>
+            <li><span class="num amber">6</span><div class="card"><strong>If red:</strong> triage + ci-failure-triage. Drift → self-heal patches the page object, re-runs the same test, opens <code>heal/…</code>. Real bug → bug-reporter drafts AQPBT bug, waits for you. Ambiguous → stop.</div></li>
+            <li><span class="num green">7</span><div class="card"><strong>If green:</strong> open a pull request (backlog: branch <code>tests/aqpbt-15-…</code>, body links the feature file and the Jira key). Add label <code>tests-generated</code> only when the spec is green.</div></li>
+            <li><span class="num gold">8</span><div class="card"><strong>eval-report</strong> if a generation or heal trigger fired. Update <code>eval-report.md</code> or note <code>eval: skipped</code>.</div></li>
+            <li><span class="num red">9</span><div class="card"><strong>You</strong> review and merge. The framework stops here on purpose.</div></li>
+          </ol>
+          <div class="teach"><strong>Remember the split.</strong> Rules set the law. Skills are the recipes. Agents are the cooks for one dish. Hooks are the smoke alarm. The orchestrator is the head chef who never plates the food — it delegates, then checks the result.</div>
+        </section>
+      </main>
+    </div>
+  </div>
+  <footer>
+    <div class="wrap">
+      Schema of the BuddyApp Playwright agent framework as it exists in this repository. Paths and names are taken from <code>.cursor/</code> and <code>.github/workflows/</code>. This page does not change how the agents run; it only maps them.
+    </div>
+  </footer>
+  <script>
+    const tocLinks = Array.from(document.querySelectorAll(".toc a"));
+    const sections = tocLinks
+      .map((link) => document.querySelector(link.getAttribute("href")))
+      .filter(Boolean);
+    function markToc() {
+      let current = sections[0];
+      sections.forEach((section) => {
+        if (section.getBoundingClientRect().top < 140) current = section;
+      });
+      tocLinks.forEach((link) => {
+        link.classList.toggle("active", link.getAttribute("href") === "#" + current.id);
+      });
+    }
+    document.addEventListener("scroll", markToc, { passive: true });
+    markToc();
+  </script>
+</body>
+</html>

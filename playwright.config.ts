@@ -30,7 +30,7 @@ export default defineConfig({
   },
   projects: [
     {
-      name: 'tests',
+      name: 'app',
       testMatch: '**/*.spec.ts',
     },
   ],
