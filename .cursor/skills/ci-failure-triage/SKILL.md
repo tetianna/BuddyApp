@@ -45,18 +45,27 @@ BuddyTime **application source is not in this repo** — judge against AC, Gherk
 
 | Label | Meaning | Next step |
 |-------|---------|-----------|
-| **Test issue (drift)** | UI or copy changed; spec/POM/timeout/data is wrong; flake without product mismatch. | Suggest fix in repo; **no** Jira product bug. |
+| **Test issue (drift)** | UI or copy changed; spec/POM/timeout/data is wrong; shared-account pollution; strict assertion mismatch. | Suggest fix in repo; **no** Jira product bug. |
 | **Real app bug** | App behavior contradicts AC / feature / Confluence on a healthy env. | Hand off to **jira-bug-reporter** (draft only; human approves filing). |
 | **Ambiguous** | AC silent, env/auth/data unclear, or conflicting docs. | List unknowns; ask human before changing tests or filing. |
+| **Inconclusive** | Test **passed on re-run** or timing/retry flake without product mismatch. | **Not** drift — stop; gather more evidence; do not self-heal. |
 
-### 5. Report
+### 5. Evidence file and scorer (gates)
+
+1. Write evidence only to `.test-artifacts/evidence/<runId>-<testId>.json` (`artifact`, `line`, `excerpt` per item — never `score`, `confidence`, or `weight`).
+2. Copy to `.test-artifacts/evidence/current.json`.
+3. Run and return stdout from `npx tsx scripts/score-evidence.ts --verify-only .test-artifacts/evidence/current.json`.
+
+### 6. Report
 
 Post as a **PR comment** when a PR exists; otherwise return the same block to the parent agent.
 
 ```markdown
 ## CI triage — <run id or "local">
 
-**Classification:** test issue (drift) | real app bug | ambiguous
+**Scorer:** `decision` / `side` / `decisionId` / `allowedActions` from `score-evidence.ts` (authoritative for routing)
+
+**Classification (prose only):** test issue (drift) | real app bug | ambiguous | inconclusive
 
 **Root cause:** <why it failed — not only what assertion said>
 

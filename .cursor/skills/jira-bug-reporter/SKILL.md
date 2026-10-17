@@ -23,19 +23,18 @@ Re-run **once**:
 npx playwright test <path-to-spec> -g "<test title fragment>"
 ```
 
-- **Passes on retry** → treat as flake or environment; do **not** file a product bug without evidence and user direction.
-- **Fails again** → continue triage.
+- **Passes on retry** → scorer **inconclusive** (not drift); do **not** file a product bug.
+- **Fails again** → require scorer **act** + **bug** before draft (`createJiraIssue` field **`issueType`**: **Bug**).
 
 ### 3. Root cause
 
-Classify:
+Use scorer JSON on `current.json` — not chat labels or saved decision files.
 
-| Class | Action |
-|-------|--------|
-| **Product defect** | App behavior contradicts AC / Confluence / feature file. → Draft bug (steps 4–6). |
-| **Test drift** | UI changed; expectation in spec/POM is stale. → Self-heal test/POM; **no** Jira bug. |
-| **Test bug** | Wrong locator, missing wait, bad data, cleanup gap. → Fix automation; **no** Jira bug. |
-| **Environment** | `APP_URL`, auth, credentials, third-party down. → Fix config or report ops; **no** product bug unless app is wrong on a healthy env. |
+| Scorer | Action |
+|--------|--------|
+| **act** + **bug** | Draft bug (steps 4–6); `issueType` **Bug**. |
+| **act** + **drift** | **Stop** → self-heal. |
+| **escalate** / **inconclusive** | **Stop** → approval file or more evidence. |
 
 Read the spec, relevant `pages/` objects, and the live app (browser MCP or re-run with headed) as needed.
 

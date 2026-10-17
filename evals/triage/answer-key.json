@@ -1,0 +1,7 @@
+[
+  {
+    "id": "aqpbt-6-ac3-shared-kids",
+    "input": "Playwright CI on main (run 39046809032) after merge. Failing test: AQPBT-6 AC3 — whose-birthday dropdown options. expect(locator).toHaveText failed: expected Whose birthday? (optional), Mia, Maria; received placeholder plus DelTest1792193661316, DelTest1792193671877, DelTest1792193716371. Page snapshot shows textbox Password and birthday combobox with DelTest child names only. No AQPBT-8 tests in failure list.",
+    "expected": "drift"
+  }
+]

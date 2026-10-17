@@ -1,0 +1,12 @@
+{
+  "model": "composer-2.5",
+  "startedAt": "2026-10-17T15:52:00.000Z",
+  "finishedAt": "2026-10-17T15:54:00.000Z",
+  "predictions": [
+    {
+      "id": "aqpbt-6-ac3-shared-kids",
+      "predicted": "drift",
+      "evidence": "Exact toHaveText on Mia/Maria contradicts live dropdown listing DelTest* kids on shared main-family account; AC3 intent is host children present, not product regression."
+    }
+  ]
+}

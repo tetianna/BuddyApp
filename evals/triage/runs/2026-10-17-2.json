@@ -1,0 +1,12 @@
+{
+  "model": "composer-2.5",
+  "startedAt": "2026-10-17T16:00:00.000Z",
+  "finishedAt": "2026-10-17T16:02:00.000Z",
+  "predictions": [
+    {
+      "id": "aqpbt-6-ac3-shared-kids",
+      "predicted": "drift",
+      "evidence": "Shared test data: dashboard kids were DelTest leftovers; birthdays dropdown reflects account state. Fix is test data or assertion scope, not BuddyTime product bug."
+    }
+  ]
+}

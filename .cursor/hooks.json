@@ -3,6 +3,16 @@
   "hooks": {
     "preToolUse": [
       {
+        "command": "python .cursor/hooks/guard-approvals.py",
+        "matcher": "Write|StrReplace",
+        "failClosed": true
+      },
+      {
+        "command": "python .cursor/hooks/guard-heal-gate.py",
+        "matcher": "Write|StrReplace",
+        "failClosed": true
+      },
+      {
         "command": "python .cursor/hooks/guard-test-assertions.py",
         "matcher": "Write|StrReplace",
         "failClosed": true
@@ -10,6 +20,19 @@
       {
         "command": "python .cursor/hooks/guard-constitution.py",
         "matcher": "Write|StrReplace",
+        "failClosed": true
+      }
+    ],
+    "beforeShellExecution": [
+      {
+        "command": "python .cursor/hooks/guard-pr-gate.py",
+        "matcher": "gh pr create",
+        "failClosed": true
+      }
+    ],
+    "beforeMCPExecution": [
+      {
+        "command": "python .cursor/hooks/guard-jira-bug-gate.py",
         "failClosed": true
       }
     ]

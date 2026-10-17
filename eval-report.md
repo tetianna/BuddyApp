@@ -38,4 +38,24 @@ Generation work is ahead of Confluence depth for some stories (e.g. AQPBT-8), so
 
 ## Next action
 
-Merge or review PR #4 after human check; on the next orchestrator run, emit an explicit **Proposal** block so confidence in the report matches the constitution gate without retroactive notes.
+Add more triage cases to `evals/triage/answer-key.json` (human-owned); re-run `npx tsx evals/score.ts triage` after each batch of runs.
+
+## Agent accuracy — triage (2026-10-17)
+
+**Scenario:** AQPBT-6 AC3 CI failure on `main` (run [39046809032](https://github.com/tetianna/BuddyApp/actions/runs/39046809032)) — birthday dropdown expected Mia/Maria, account had `DelTest*` kids. Heal: [PR #5](https://github.com/tetianna/BuddyApp/pull/5).
+
+**Runs:** `evals/triage/runs/2026-10-17-1.json`, `2026-10-17-2.json`, `2026-10-17-3.json`  
+**How measured:** `npx tsx evals/score.ts triage` on pooled predictions; cross-run agreement = share of key cases where all 3 runs predicted the same class.
+
+| Metric | Value |
+|--------|-------|
+| Overall accuracy | **100.0%** (3/3) |
+| Cross-run agreement | **100.0%** (1/1 case) |
+| drift precision / recall | **100.0%** / **100.0%** (3/3) |
+| bug precision / recall | n/a (no bug labels in key) |
+| ambiguous precision / recall | n/a |
+| False positives (drift / bug / ambiguous) | 0 / 0 / 0 |
+
+**Answer key:** `evals/triage/answer-key.json` — case `aqpbt-6-ac3-shared-kids`, expected **drift** (shared test data + strict assertion, not product defect).
+
+**Notes:** Single-case eval; precision/recall for bug and ambiguous are n/a until those classes appear in the key.

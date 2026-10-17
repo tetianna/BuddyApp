@@ -66,13 +66,14 @@ Drive a QA task to **Done** by delegating. The only work you do yourself is read
 
 ## Heal on red
 
-Always **triage first** (`triage` + `ci-failure-triage`).
+Always **triage first** (`triage` + `ci-failure-triage`) and run `npx tsx scripts/score-evidence.ts --verify-only .test-artifacts/evidence/current.json`. Route on scorer output only.
 
-| Classification | Action |
-|----------------|--------|
-| **Real app bug** | `bug-reporter` — **never** self-heal |
-| **Drift** | `self-heal`: re-discover via accessibility snapshot, patch **POM only**, re-run green with **assertions unchanged**, repair PR `heal/<desc>` — **never merge** |
-| **Ambiguous** | Stop and escalate |
+| Scorer | Action |
+|--------|--------|
+| **act** + **drift** | `self-heal` on `heal/*`, POM only — **never merge** |
+| **act** + **bug** | `bug-reporter` draft — **never** self-heal |
+| **escalate** | Evidence table; wait for `.test-artifacts/approvals/<decisionId>.json` |
+| **inconclusive** | Stop; list gaps (retry pass ≠ drift) |
 
 **Hard stops**
 

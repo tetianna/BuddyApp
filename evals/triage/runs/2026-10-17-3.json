@@ -1,0 +1,12 @@
+{
+  "model": "composer-2.5",
+  "startedAt": "2026-10-17T16:10:00.000Z",
+  "finishedAt": "2026-10-17T16:12:00.000Z",
+  "predictions": [
+    {
+      "id": "aqpbt-6-ac3-shared-kids",
+      "predicted": "drift",
+      "evidence": "Classification test issue: strict option list in tests/aqpbt-6-birthdays-create-party.spec.ts:53; CI artifact bc1e2d4050b295c86710aabe3c1900b406baac3e.md shows expected vs received arrays."
+    }
+  ]
+}

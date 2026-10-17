@@ -9,13 +9,17 @@ Fix **one** broken locator in `pages/` when triage says **test issue (drift)**. 
 
 ## Prerequisite
 
-A completed **ci-failure-triage** (or equivalent) diagnosis with classification:
+Scorer on `.test-artifacts/evidence/current.json`:
 
-| Classification | Action |
-|----------------|--------|
-| **Test issue (drift)** | Continue this skill. |
-| **Real app bug** | **Stop** → **jira-bug-reporter**. |
-| **Ambiguous** / **missing** | **Stop** → ask human or re-triage. |
+```bash
+npx tsx scripts/score-evidence.ts --verify-only .test-artifacts/evidence/current.json
+```
+
+| `decision` + `side` | Action |
+|---------------------|--------|
+| **act** + **drift** | Continue (hooks allow `pages/` on `heal/*`). |
+| **act** + **bug** | **Stop** → **jira-bug-reporter**. |
+| **escalate** / **inconclusive** | **Stop** → human `.test-artifacts/approvals/<decisionId>.json` or re-triage. |
 
 ## Steps
 
