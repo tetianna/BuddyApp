@@ -6,6 +6,7 @@ import dotenv from 'dotenv';
 
 import { AppRoute } from '../test-data/routes';
 import { ALT_AUTH_FILE, AUTH_FILE } from './auth.constants';
+import { ensurePracticumHostChildren } from './ensure-practicum-children';
 
 dotenv.config();
 
@@ -24,6 +25,10 @@ async function saveStorageState(
   await page.getByRole('textbox', { name: 'Password' }).fill(password);
   await page.getByRole('button', { name: 'Log in', exact: true }).click();
   await page.waitForURL(new RegExp(`${AppRoute.Dashboard}(\\?|$)`));
+
+  if (path.resolve(outFile) === path.resolve(AUTH_FILE)) {
+    await ensurePracticumHostChildren(page);
+  }
 
   fs.mkdirSync(path.dirname(outFile), { recursive: true });
   await context.storageState({ path: path.resolve(outFile) });
