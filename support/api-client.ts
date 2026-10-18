@@ -45,6 +45,13 @@ function readBearerToken(storageStatePath: string): string {
   throw new Error(`bt_token not found in ${storageStatePath}. Re-run global setup.`);
 }
 
+/** Playwright API context with no Bearer token (for unauthenticated contract checks). */
+export async function createUnauthenticatedApiContext(): Promise<APIRequestContext> {
+  return request.newContext({
+    baseURL: resolveBaseURL(),
+  });
+}
+
 /** Playwright API context authenticated as the given family (`storageState` + Bearer JWT). */
 export async function createApiContext(owner: RecordOwner): Promise<APIRequestContext> {
   const storageState = owner === 'main' ? AUTH_FILE : ALT_AUTH_FILE;
@@ -56,6 +63,58 @@ export async function createApiContext(owner: RecordOwner): Promise<APIRequestCo
       Authorization: `Bearer ${token}`,
     },
   });
+}
+
+/** Alias used by API fixtures — same as {@link createApiContext}. */
+export const createApiContextForOwner = createApiContext;
+
+type HostChildResponse = {
+  id: string;
+  firstName: string;
+  birthYear: number;
+  birthMonth: number;
+  age: number;
+  gender: string;
+  interests: string[];
+  avatarKey: string;
+};
+
+export type CreateHostChildPayload = {
+  firstName: string;
+  birthYear: number;
+  birthMonth: number;
+  gender: string;
+  avatarKey: string;
+  interests: string[];
+};
+
+/** Creates a host child (`POST /api/v1/children`). */
+export async function createHostChild(
+  api: APIRequestContext,
+  payload: CreateHostChildPayload,
+): Promise<HostChildResponse> {
+  const response = await api.post('/api/v1/children', { data: payload });
+  if (response.status() !== 201) {
+    throw new Error(`createHostChild failed: HTTP ${response.status()} ${await response.text()}`);
+  }
+  return (await response.json()) as HostChildResponse;
+}
+
+/** Removes a host child (`DELETE /api/v1/children/{id}`). */
+export async function deleteHostChild(
+  api: APIRequestContext,
+  childId: string,
+): Promise<CleanupResult> {
+  const type: RecordType = 'host-child';
+  const response = await api.delete(`/api/v1/children/${childId}`);
+  const message = response.statusText() || (await response.text().catch(() => ''));
+  return {
+    type,
+    id: childId,
+    ok: response.ok() || response.status() === 204,
+    status: response.status(),
+    message: message.slice(0, 200),
+  };
 }
 
 /** Cancels a birthday event created via `POST /api/v1/events` (discovery: cancel, not DELETE). */

@@ -5,7 +5,7 @@ export const TRACKER_PATH = path.join('.test-artifacts', 'created-records.jsonl'
 
 export type RecordOwner = 'main' | 'alt';
 
-export type RecordType = 'birthday-event';
+export type RecordType = 'birthday-event' | 'host-child';
 
 export type TrackedRecord = {
   type: RecordType;

@@ -44,6 +44,7 @@ Non-negotiables for every task. Details and examples: `playwright-conventions.md
 | Skill | Role |
 |-------|------|
 | `api-cleanup` | Teardown test data |
+| `api-catalog-discover` | Discover `/api/v1` and write readable `api/CATALOG.md` |
 | `ci-failure-triage` | Classify red CI |
 | `eval-report` | Refresh suite metrics |
 | `exploratory-charter` | Session charter template |
@@ -77,6 +78,6 @@ Behavioral only, not hook-enforced. Applies to every non-trivial task (new spec,
 
 3. **Edit** — only after the gate allows; the smallest diff that satisfies the scope.
 
-**Red-run actions** are gated by `npx tsx scripts/score-evidence.ts --verify-only .test-artifacts/evidence/current.json` and `.cursor/hooks/*`; the self-assessment gates nothing.
+**Every triage** must write evidence and run `npx tsx scripts/score-evidence.ts --verify-only .test-artifacts/evidence/current.json` (green or red). **Heal, bug draft, and related hooks** trust only that scorer output and `.cursor/hooks/*` — not chat labels; the self-assessment gates nothing.
 
 Never invent file paths, module names, enum values, repeated UI strings, env var names, credentials, user-facing messages, labels, or API routes. Ask the human or explore the repo or the live app. If `.env.example`, `test-data/`, the ticket, or the live app does not confirm a value, it is an unknown — not a placeholder.

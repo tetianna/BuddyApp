@@ -21,7 +21,7 @@ type RuleHit = {
 };
 
 type DecisionSide = 'drift' | 'bug';
-type DecisionKind = 'act' | 'escalate' | 'inconclusive';
+type DecisionKind = 'act' | 'escalate' | 'inconclusive' | 'pass';
 
 export type ScoredDecision = {
   decisionId: string;
@@ -33,6 +33,11 @@ export type ScoredDecision = {
 };
 
 const FORBIDDEN_ITEM_KEYS = ['score', 'confidence', 'weight'] as const;
+
+const PASS_PATTERNS: { id: string; re: RegExp }[] = [
+  { id: 'ci-green', re: /\b(?:all tests passed|no failing tests|job succeeded|regression (?:job )?passed)\b/i },
+  { id: 'run-green', re: /\bCI (?:run )?green\b|\bworkflow run.*\bsuccess\b/i },
+];
 
 const INCONCLUSIVE_PATTERNS: { id: string; re: RegExp }[] = [
   { id: 'retry-inconclusive', re: /\bpass(?:ed)?\s+on\s+retry\b/i },
@@ -111,6 +116,19 @@ export function scoreEvidence(evidence: EvidenceFile): ScoredDecision {
       allowedActions: [],
       rules: [{ id: 'missing-items', fired: true, detail: 'No evidence items' }],
       summary: 'Missing evidence items.',
+    };
+  }
+
+  const passRules = evaluateRules(PASS_PATTERNS, corpus);
+  rules.push(...passRules);
+  if (passRules.some((rule) => rule.fired)) {
+    return {
+      decisionId,
+      decision: 'pass',
+      side: null,
+      allowedActions: [],
+      rules,
+      summary: 'Green run — no heal or bug action.',
     };
   }
 

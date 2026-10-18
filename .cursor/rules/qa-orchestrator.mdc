@@ -42,7 +42,7 @@ Drive a QA task to **Done** by delegating. The only work you do yourself is read
 |-------|-------------------------------|
 | `jira-ticket-analyzer` | Analyze a ticket → Gherkin plan |
 | `explore-and-generate` | Ticket-less discovery → plan |
-| `ci-failure-triage` | Via `triage` on red runs |
+| `ci-failure-triage` | Via `triage` after every run (pass or fail) — always evidence + scorer |
 | `self-heal` | Drift only, after triage |
 | `jira-bug-reporter` | Via `bug-reporter` after real-bug classification |
 | `api-cleanup` | Ensure generated tests tear down data |
@@ -55,7 +55,7 @@ Drive a QA task to **Done** by delegating. The only work you do yourself is read
 
 1. Analyze (`jira-ticket-analyzer`) → plan saved to `features/<key>.feature.md`
 2. Delegate → `test-writer`
-3. Run the suite
+3. Run the suite → **triage** (evidence + scorer always; see below)
 4. If red → **Heal on red** (below)
 
 **No ticket**
@@ -64,16 +64,21 @@ Drive a QA task to **Done** by delegating. The only work you do yourself is read
 2. Delegate → `test-writer`
 3. Run → heal on red if needed
 
-## Heal on red
+## Triage and scorer (every run)
 
-Always **triage first** (`triage` + `ci-failure-triage`) and run `npx tsx scripts/score-evidence.ts --verify-only .test-artifacts/evidence/current.json`. Route on scorer output only.
+After **every** Playwright or CI run (green or red), delegate **`triage`** + `ci-failure-triage`: write `.test-artifacts/evidence/<runId>-<testId>.json`, copy to `current.json`, run `npx tsx scripts/score-evidence.ts --verify-only .test-artifacts/evidence/current.json`. Route on scorer output only — never skip because the run passed.
 
 | Scorer | Action |
 |--------|--------|
+| **pass** | Done for this run — no heal, no bug |
 | **act** + **drift** | `self-heal` on `heal/*`, POM only — **never merge** |
 | **act** + **bug** | `bug-reporter` draft — **never** self-heal |
 | **escalate** | Evidence table; wait for `.test-artifacts/approvals/<decisionId>.json` |
 | **inconclusive** | Stop; list gaps (retry pass ≠ drift) |
+
+## Heal on red
+
+Only when the run **failed** and scorer is **act** + **drift** (or approved escalate).
 
 **Hard stops**
 

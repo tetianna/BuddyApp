@@ -1,4 +1,4 @@
-import { cancelBirthdayEvent, createApiContext } from './api-client';
+import { cancelBirthdayEvent, createApiContext, deleteHostChild } from './api-client';
 import { getTrackedRecords, resetTracker, type RecordType, type TrackedRecord } from './record-tracker';
 
 export type TrackedCleanupOptions = {
@@ -27,6 +27,9 @@ async function deleteTrackedRecord(record: TrackedRecord): Promise<{
     switch (record.type) {
       case 'birthday-event':
         result = await cancelBirthdayEvent(api, record.id);
+        break;
+      case 'host-child':
+        result = await deleteHostChild(api, record.id);
         break;
       default: {
         const exhaustive: never = record.type;

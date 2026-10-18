@@ -35,16 +35,13 @@ async function saveStorageState(
   await browser.close();
 }
 
-/** Writes auth JSON before the suite so signed-in specs can use `storageState`. */
-export default async function globalSetup(config: FullConfig): Promise<void> {
-  const baseURL = config.projects[0]?.use?.baseURL;
+/** Writes auth JSON so signed-in specs can use `storageState`. */
+export async function ensureAuthStorageStates(baseURL: string): Promise<void> {
   const email = process.env.APP_USER_EMAIL;
   const password = process.env.APP_USER_PASSWORD;
 
-  if (!baseURL || !email || !password) {
-    throw new Error(
-      'APP_URL, APP_USER_EMAIL, and APP_USER_PASSWORD must be set before running tests.',
-    );
+  if (!email || !password) {
+    throw new Error('APP_USER_EMAIL and APP_USER_PASSWORD must be set before running tests.');
   }
 
   await saveStorageState(baseURL, email, password, AUTH_FILE);
@@ -57,4 +54,13 @@ export default async function globalSetup(config: FullConfig): Promise<void> {
       ALT_AUTH_FILE,
     );
   }
+}
+
+/** Writes auth JSON before the suite so signed-in specs can use `storageState`. */
+export default async function globalSetup(config: FullConfig): Promise<void> {
+  const baseURL = config.projects[0]?.use?.baseURL;
+  if (!baseURL) {
+    throw new Error('APP_URL must be set before running tests.');
+  }
+  await ensureAuthStorageStates(baseURL);
 }

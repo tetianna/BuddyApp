@@ -1,11 +1,13 @@
 ---
 name: ci-failure-triage
-description: When a CI run is red, pull the run's logs and the playwright-report artifact via GitHub MCP or GH CLI, read the Playwright error and trace, cross-reference the spec, POM, and app source in the repo, classify real app bug vs test issue, and post a structured diagnosis to the PR. Use whenever a build fails — even if triage isn't asked for.
+description: Triage any CI or local Playwright run (failed or passed). Always write evidence and run score-evidence.ts. On red runs, pull logs and playwright-report, classify bug vs test issue, and post diagnosis. Use whenever a run is discussed or triage is asked — even when CI is green.
 ---
 
-# CI failure triage (Playwright)
+# CI triage (Playwright)
 
-Turn a red CI or local run into a **structured diagnosis**. Do not merge, push fixes, or file Jira without the human’s direction.
+Turn any CI or local run into a **structured diagnosis** with **mandatory evidence + scorer**. Do not merge, push fixes, or file Jira without the human’s direction.
+
+**Always (green or red):** steps **5** (evidence file + `score-evidence.ts`) and include scorer JSON in the report. Skipping the scorer because the run passed is not allowed.
 
 ## Workflow
 
@@ -18,7 +20,9 @@ Turn a red CI or local run into a **structured diagnosis**. Do not merge, push f
 
 Note workflow name, run id, commit SHA, and branch.
 
-### 2. Read the failure
+### 2. Read the run
+
+**If the run failed:**
 
 - Failing test title, file, project, tag.
 - Assertion: **expected** vs **received** (or timeout / navigation).
@@ -29,6 +33,12 @@ npx playwright show-trace <path-to-trace.zip>
 ```
 
 - If Playwright wrote an **aria snapshot** in `test-results/.../error-context.md`, **quote the relevant lines** in the report.
+
+**If the run passed:**
+
+- Workflow name, run id, branch, commit SHA, job conclusion.
+- Regression/suite scope (e.g. `@regression` project).
+- Evidence excerpt must state **green** explicitly (e.g. “regression job passed; no failing tests”) so the scorer can return `pass`.
 
 ### 3. Cross-reference
 
@@ -49,8 +59,9 @@ BuddyTime **application source is not in this repo** — judge against AC, Gherk
 | **Real app bug** | App behavior contradicts AC / feature / Confluence on a healthy env. | Hand off to **jira-bug-reporter** (draft only; human approves filing). |
 | **Ambiguous** | AC silent, env/auth/data unclear, or conflicting docs. | List unknowns; ask human before changing tests or filing. |
 | **Inconclusive** | Test **passed on re-run** or timing/retry flake without product mismatch. | **Not** drift — stop; gather more evidence; do not self-heal. |
+| **Pass (green)** | Whole run or requested scope completed with no failure. | Scorer `pass` — no heal, no bug draft. |
 
-### 5. Evidence file and scorer (gates)
+### 5. Evidence file and scorer (gates — mandatory every triage)
 
 1. Write evidence only to `.test-artifacts/evidence/<runId>-<testId>.json` (`artifact`, `line`, `excerpt` per item — never `score`, `confidence`, or `weight`).
 2. Copy to `.test-artifacts/evidence/current.json`.
@@ -65,9 +76,11 @@ Post as a **PR comment** when a PR exists; otherwise return the same block to th
 
 **Scorer:** `decision` / `side` / `decisionId` / `allowedActions` from `score-evidence.ts` (authoritative for routing)
 
-**Classification (prose only):** test issue (drift) | real app bug | ambiguous | inconclusive
+**Run result:** passed | failed
 
-**Root cause:** <why it failed — not only what assertion said>
+**Classification (prose only):** pass (green) | test issue (drift) | real app bug | ambiguous | inconclusive
+
+**Root cause:** <why it failed, or “none — regression green” for pass>
 
 **Location:** `<file>:<line>` (spec and/or POM)
 

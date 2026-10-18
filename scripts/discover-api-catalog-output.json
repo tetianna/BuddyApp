@@ -1,0 +1,383 @@
+[
+  {
+    "method": "GET",
+    "path": "/api/v1/availability",
+    "pages": [
+      "Dashboard",
+      "Availability",
+      "Dashboard (add child)"
+    ],
+    "auth": "Authorization header",
+    "status": 200,
+    "requestFields": "—",
+    "responseShape": "{ rules:array(2), exceptions:array(2) }",
+    "evidence": "executed",
+    "safeForTests": "yes",
+    "reqBodySample": ""
+  },
+  {
+    "method": "POST",
+    "path": "/api/v1/children",
+    "pages": [
+      "Dashboard (add child)"
+    ],
+    "auth": "Authorization header",
+    "status": 201,
+    "requestFields": "firstName, birthYear, birthMonth, gender, avatarKey, interests",
+    "responseShape": "{ id:string, firstName:string, birthYear:number, birthMonth:number, age:number, gender:string, interests:array(0), avatarKey:string }",
+    "evidence": "executed",
+    "safeForTests": "no (write without observed undo)",
+    "reqBodySample": "{\"firstName\":\"ApiCat1792262238767\",\"birthYear\":2019,\"birthMonth\":8,\"gender\":\"boy\",\"avatarKey\":\"fox\",\"interests\":[]}"
+  },
+  {
+    "method": "DELETE",
+    "path": "/api/v1/children/{id}",
+    "pages": [
+      "Dashboard (remove child)"
+    ],
+    "auth": "Authorization header",
+    "status": 204,
+    "requestFields": "—",
+    "responseShape": "—",
+    "evidence": "executed",
+    "safeForTests": "yes (delete observed on Dashboard)",
+    "reqBodySample": ""
+  },
+  {
+    "method": "GET",
+    "path": "/api/v1/communities",
+    "pages": [
+      "Dashboard",
+      "Communities",
+      "Birthdays",
+      "Dashboard (add child)"
+    ],
+    "auth": "Authorization header",
+    "status": 200,
+    "requestFields": "—",
+    "responseShape": "array<object>",
+    "evidence": "executed",
+    "safeForTests": "yes",
+    "reqBodySample": ""
+  },
+  {
+    "method": "GET",
+    "path": "/api/v1/communities/{id}",
+    "pages": [
+      "Birthdays"
+    ],
+    "auth": "Authorization header",
+    "status": 200,
+    "requestFields": "—",
+    "responseShape": "{ id:string, name:string, type:string, description:string, myRole:string, myStatus:string, familiesCount:number, pendingCount:number, createdAt:string, members:array(4) }",
+    "evidence": "executed",
+    "safeForTests": "yes",
+    "reqBodySample": ""
+  },
+  {
+    "method": "GET",
+    "path": "/api/v1/connections",
+    "pages": [
+      "Dashboard",
+      "Friends",
+      "Communities",
+      "Availability",
+      "Playdates",
+      "Birthdays",
+      "Profile",
+      "Dashboard (add child)",
+      "Dashboard (remove child)"
+    ],
+    "auth": "Authorization header",
+    "status": 200,
+    "requestFields": "—",
+    "responseShape": "array<object>",
+    "evidence": "executed",
+    "safeForTests": "yes",
+    "reqBodySample": ""
+  },
+  {
+    "method": "GET",
+    "path": "/api/v1/events",
+    "pages": [
+      "Birthdays"
+    ],
+    "auth": "Authorization header",
+    "status": 200,
+    "requestFields": "—",
+    "responseShape": "array<object>",
+    "evidence": "executed",
+    "safeForTests": "yes",
+    "reqBodySample": ""
+  },
+  {
+    "method": "GET",
+    "path": "/api/v1/matches",
+    "pages": [
+      "Playdates"
+    ],
+    "auth": "Authorization header",
+    "status": 200,
+    "requestFields": "—",
+    "responseShape": "array<object>",
+    "evidence": "executed",
+    "safeForTests": "yes",
+    "reqBodySample": ""
+  },
+  {
+    "method": "GET",
+    "path": "/api/v1/me",
+    "pages": [
+      "Dashboard",
+      "Friends",
+      "Communities",
+      "Availability",
+      "Playdates",
+      "Birthdays",
+      "Profile",
+      "Dashboard (add child)",
+      "Dashboard (remove child)"
+    ],
+    "auth": "Authorization header",
+    "status": 200,
+    "requestFields": "—",
+    "responseShape": "{ parent:object, family:object, isAdmin:boolean }",
+    "evidence": "executed",
+    "safeForTests": "yes",
+    "reqBodySample": ""
+  },
+  {
+    "method": "GET",
+    "path": "/api/v1/playdates",
+    "pages": [
+      "Dashboard",
+      "Playdates",
+      "Dashboard (add child)"
+    ],
+    "auth": "Authorization header",
+    "status": 200,
+    "requestFields": "—",
+    "responseShape": "array(0)",
+    "evidence": "executed",
+    "safeForTests": "yes",
+    "reqBodySample": ""
+  },
+  {
+    "method": "GET",
+    "path": "/app",
+    "pages": [
+      "Friends",
+      "Communities",
+      "Availability",
+      "Playdates",
+      "Birthdays",
+      "Profile"
+    ],
+    "auth": "unknown",
+    "status": 200,
+    "requestFields": "—",
+    "responseShape": "(text)",
+    "evidence": "executed",
+    "safeForTests": "yes",
+    "reqBodySample": ""
+  },
+  {
+    "method": "GET",
+    "path": "/availability",
+    "pages": [
+      "Dashboard",
+      "Friends",
+      "Communities",
+      "Playdates",
+      "Birthdays",
+      "Profile",
+      "Dashboard (add child)"
+    ],
+    "auth": "unknown",
+    "status": 200,
+    "requestFields": "—",
+    "responseShape": "(text)",
+    "evidence": "executed",
+    "safeForTests": "yes",
+    "reqBodySample": ""
+  },
+  {
+    "method": "GET",
+    "path": "/birthdays",
+    "pages": [
+      "Dashboard",
+      "Friends",
+      "Communities",
+      "Availability",
+      "Playdates",
+      "Profile",
+      "Dashboard (add child)"
+    ],
+    "auth": "unknown",
+    "status": 200,
+    "requestFields": "—",
+    "responseShape": "(text)",
+    "evidence": "executed",
+    "safeForTests": "yes",
+    "reqBodySample": ""
+  },
+  {
+    "method": "GET",
+    "path": "/birthdays/{id}",
+    "pages": [
+      "Birthdays"
+    ],
+    "auth": "unknown",
+    "status": 200,
+    "requestFields": "—",
+    "responseShape": "(text)",
+    "evidence": "executed",
+    "safeForTests": "yes",
+    "reqBodySample": ""
+  },
+  {
+    "method": "GET",
+    "path": "/calendar",
+    "pages": [
+      "Dashboard",
+      "Friends",
+      "Communities",
+      "Availability",
+      "Playdates",
+      "Birthdays",
+      "Profile",
+      "Dashboard (add child)"
+    ],
+    "auth": "unknown",
+    "status": 200,
+    "requestFields": "—",
+    "responseShape": "(text)",
+    "evidence": "executed",
+    "safeForTests": "yes",
+    "reqBodySample": ""
+  },
+  {
+    "method": "POST",
+    "path": "/cdn-cgi/rum",
+    "pages": [
+      "Dashboard",
+      "Friends",
+      "Communities",
+      "Availability",
+      "Playdates",
+      "Birthdays",
+      "Profile",
+      "Dashboard (add child)"
+    ],
+    "auth": "unknown",
+    "status": 204,
+    "requestFields": "startTime, pageloadId, eventType, nt, location, versions, bi, memory, firstPaint, firstContentfulPaint, timingsV2, siteToken, st",
+    "responseShape": "—",
+    "evidence": "executed",
+    "safeForTests": "no (write without observed undo)",
+    "reqBodySample": "{\"startTime\":1792262223999,\"pageloadId\":\"ea0e87ab-7fd8-4a92-8325-1cd725cf8202\",\"eventType\":1,\"nt\":\"navigate\",\"location\":\"https://test.buddytime.ca/app\",\"versions\":{\"fl\":\"2024.11.0\",\"js\":\"2026.10.1\",\"timings\":2},\"bi\":{\"be\":\"Blink\",\"bev\":\"153\",\"bv\":\"153\",\"ov\":\"11\"},\"memory\":{\"totalJSHeapSize\":10000000,\"usedJSHeapSize\":10000000,\"jsHeapSizeLimit\":3760000000},\"firstPaint\":0,\"firstContentfulPaint\":0,\"timingsV2\":{\"nextHopProtocol\":\"h2\",\"domainLookupStart\":10,\"domainLookupEnd\":17,\"connectStart\":17,\"connectEnd\":82,\"secureConnectionStart\":45,\"requestStart\":82,\"responseStart\":137,\"responseEnd\":139,\"domInteractive\":208,\"domComplete\":347,\"loadEventStart\":347,\"loadEventEnd\":347,\"finalResponseHeadersStart\":137,\"firstInterimResponseStart\":0,\"transferSize\":3299,\"decodedBodySize\":10080},\"siteToken\":\"5e53b9d"
+  },
+  {
+    "method": "GET",
+    "path": "/communities",
+    "pages": [
+      "Dashboard",
+      "Friends",
+      "Availability",
+      "Playdates",
+      "Birthdays",
+      "Profile",
+      "Dashboard (add child)"
+    ],
+    "auth": "unknown",
+    "status": 200,
+    "requestFields": "—",
+    "responseShape": "(text)",
+    "evidence": "executed",
+    "safeForTests": "yes",
+    "reqBodySample": ""
+  },
+  {
+    "method": "GET",
+    "path": "/communities/{id}",
+    "pages": [
+      "Communities"
+    ],
+    "auth": "unknown",
+    "status": 200,
+    "requestFields": "—",
+    "responseShape": "(text)",
+    "evidence": "executed",
+    "safeForTests": "yes",
+    "reqBodySample": ""
+  },
+  {
+    "method": "GET",
+    "path": "/communities/new",
+    "pages": [
+      "Communities"
+    ],
+    "auth": "unknown",
+    "status": 200,
+    "requestFields": "—",
+    "responseShape": "(text)",
+    "evidence": "executed",
+    "safeForTests": "yes",
+    "reqBodySample": ""
+  },
+  {
+    "method": "GET",
+    "path": "/friends",
+    "pages": [
+      "Dashboard",
+      "Communities",
+      "Availability",
+      "Playdates",
+      "Birthdays",
+      "Profile",
+      "Dashboard (add child)"
+    ],
+    "auth": "unknown",
+    "status": 200,
+    "requestFields": "—",
+    "responseShape": "(text)",
+    "evidence": "executed",
+    "safeForTests": "yes",
+    "reqBodySample": ""
+  },
+  {
+    "method": "GET",
+    "path": "/playdates",
+    "pages": [
+      "Dashboard",
+      "Friends",
+      "Communities",
+      "Availability",
+      "Birthdays",
+      "Profile",
+      "Dashboard (add child)"
+    ],
+    "auth": "unknown",
+    "status": 200,
+    "requestFields": "—",
+    "responseShape": "(text)",
+    "evidence": "executed",
+    "safeForTests": "yes",
+    "reqBodySample": ""
+  },
+  {
+    "method": "GET",
+    "path": "/playdates/new",
+    "pages": [
+      "Dashboard",
+      "Dashboard (add child)"
+    ],
+    "auth": "unknown",
+    "status": 200,
+    "requestFields": "—",
+    "responseShape": "(text)",
+    "evidence": "executed",
+    "safeForTests": "yes",
+    "reqBodySample": ""
+  }
+]

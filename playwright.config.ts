@@ -30,8 +30,20 @@ export default defineConfig({
   },
   projects: [
     {
+      name: 'setup',
+      testDir: './tests/setup',
+      testMatch: '**/*.setup.ts',
+    },
+    {
       name: 'app',
+      dependencies: ['setup'],
       testMatch: '**/*.spec.ts',
+    },
+    {
+      name: 'api',
+      testDir: './api',
+      testMatch: '**/*.api.spec.ts',
+      dependencies: ['setup'],
     },
   ],
 });
