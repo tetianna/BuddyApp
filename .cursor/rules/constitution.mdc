@@ -39,12 +39,20 @@ Non-negotiables for every task. Details and examples: `playwright-conventions.md
 
 ## Index
 
+**Rules** (`.cursor/rules/`)
+
+| Rule | Role |
+|------|------|
+| `qa-orchestrator` | Coordinate tickets, CI, and backlog; route API vs UI delegation |
+
 **Skills** (`.cursor/skills/`)
 
 | Skill | Role |
 |-------|------|
 | `api-cleanup` | Teardown test data |
 | `api-catalog-discover` | Discover `/api/v1` and write readable `api/CATALOG.md` |
+| `api-discovery` | Map `/api/v1` traffic and update `api/CATALOG.md` |
+| `api-contract-tests` | Write Playwright API tests in `api/` from spec or `api/CATALOG.md` |
 | `ci-failure-triage` | Classify red CI |
 | `eval-report` | Refresh suite metrics |
 | `exploratory-charter` | Session charter template |
@@ -59,6 +67,7 @@ Non-negotiables for every task. Details and examples: `playwright-conventions.md
 
 | Agent | Role |
 |-------|------|
+| `api-test-writer` | Write and run Playwright API specs in `api/` |
 | `test-writer` | Write Playwright specs |
 | `triage` | Diagnose failed runs |
 | `bug-reporter` | File linked Jira bugs |

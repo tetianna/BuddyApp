@@ -1,8 +1,8 @@
 # BuddyTime API catalog (discovery)
 
-**Session:** 2026-10-17 · main family · Bearer JWT (`bt_token` in storage state → `Authorization` on `/api/v1/*`)  
+**Session:** 2026-10-19 · main family · Bearer JWT (`bt_token` in storage state → `Authorization` on `/api/v1/*`)  
 **Scope:** JSON **`/api/v1/*`** only (no HTML page loads, static files, or RUM)  
-**Capture:** Playwright + `playwright/.auth/user.json`; read-only tour of `AppRoute` except Dashboard add/remove one child
+**Capture:** Playwright + `playwright/.auth/user.json`; read-only tour of main `AppRoute` nav pages (including **Calendar**) except Dashboard add/remove one child
 
 ---
 
@@ -16,6 +16,7 @@
 | GET | `/api/v1/communities/{id}` | yes | executed |
 | GET | `/api/v1/availability` | yes | executed |
 | GET | `/api/v1/playdates` | yes | executed |
+| GET | `/api/v1/playdates?filter=upcoming` | yes | executed |
 | GET | `/api/v1/matches` | yes | executed |
 | GET | `/api/v1/events` | yes | executed |
 | POST | `/api/v1/children` | yes (DELETE undo seen) | executed |
@@ -29,14 +30,15 @@
 
 | Endpoint | Seen on pages | Status | Response (top level) | Notes |
 |----------|---------------|--------|----------------------|-------|
-| `/api/v1/me` | All seven nav pages + Dashboard child actions | 200 | `parent`, `family`, `isAdmin` | Host children appear under `family` |
-| `/api/v1/connections` | All seven nav pages + Dashboard child actions | 200 | array of connections | Friends / circle data |
+| `/api/v1/me` | All main nav pages + Dashboard child actions | 200 | `parent`, `family`, `isAdmin` | Includes **Calendar**; host children under `family` |
+| `/api/v1/connections` | All main nav pages + Dashboard child actions | 200 | array of connections | Includes **Calendar**; friends / circle data |
 | `/api/v1/communities` | Dashboard, Communities, Birthdays | 200 | array of community summaries | |
 | `/api/v1/communities/{id}` | Birthdays | 200 | community + `members` array | One community id in this session |
 | `/api/v1/availability` | Dashboard, Availability | 200 | `rules`, `exceptions` | |
-| `/api/v1/playdates` | Dashboard, Playdates | 200 | array (empty here) | |
+| `/api/v1/playdates` | Playdates | 200 | array | Playdates hub list (no query) |
+| `/api/v1/playdates?filter=upcoming` | Dashboard, Calendar, Dashboard child actions | 200 | array | Upcoming playdates; family calendar **This week** |
 | `/api/v1/matches` | Playdates | 200 | array of matches | Matcher screen |
-| `/api/v1/events` | Birthdays | 200 | array of events | `id`, `kind`, `status`, … |
+| `/api/v1/events` | Birthdays, Calendar | 200 | array of events | `id`, `kind`, `status`, …; month grid and **Birthdays this month** |
 
 **Auth (all rows):** Bearer JWT on `Authorization` header.
 
@@ -84,7 +86,7 @@ Example **POST** body (unique name in session; shape only):
 - Rate limits
 - Calls with an **expired** token (anonymous **401** is cataloged above)
 - Other writes: invites, community join/create, availability save, playdate create/cancel, profile update, admin
-- Query filters on `connections`, `matches`, `events`, `playdates`
+- Query filters on `connections`, `matches`, `events` (Calendar uses `playdates?filter=upcoming` — cataloged above)
 
 ---
 

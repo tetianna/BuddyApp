@@ -1,0 +1,147 @@
+---
+description: Conventions for API tests in api/ — sources of truth, safe auth, a success and an intentional error test per endpoint, evidence labels.
+globs: api/**
+alwaysApply: false
+---
+
+# API test conventions (`api/`)
+
+## 1. Sources of truth
+
+A **spec or approved doc** is documented; a **catalog row** is **observed** in `api/CATALOG.md`. Anything else is an **assumption** — add it under **Not yet tested** until you observe it. Tests from catalog rows are **characterization** (pin today’s behavior); tests from a written spec are **contract** tests.
+
+✅ **Good** — characterization tied to an executed catalog row (`me.api.spec.ts`):
+
+```typescript
+testDescription(
+  'Checks HTTP 200, Content-Type application/json, and top-level fields parent (object), family (object), and isAdmin (boolean) per api/CATALOG.md.',
+),
+```
+
+❌ **Bad** — asserting behavior that only lives under assumptions (`api/CATALOG.md`):
+
+```markdown
+## Not yet tested
+- Pagination (`page`, `cursor`, `limit`) on any GET
+- Error JSON for 4xx / 5xx
+```
+
+Do not ship a test for those until the catalog records an observation.
+
+---
+
+## 2. Requests
+
+**Base URL** comes from Playwright `baseURL` / `APP_URL` via `support/api-client.ts`. **Authenticated contexts** only from `api/fixtures.ts` (`mainApi`, `altApi`, `anonApi`). No Bearer token, host URL, or entity id literals in specs.
+
+✅ **Good** — fixture + relative path (`api/fixtures.ts`, `me.api.spec.ts`):
+
+```typescript
+// fixtures.ts → createApiContextForOwner('main')
+async ({ mainApi }) => {
+  await expectCatalogAuthenticatedGet(mainApi, PATH, …);
+}
+```
+
+❌ **Bad** — token or base-URL setup in a spec (belongs in `support/api-client.ts`, wired through `api/fixtures.ts`):
+
+```typescript
+function readBearerToken(storageStatePath: string): string {
+  // … bt_token from storage state — never duplicate in api/*.api.spec.ts
+}
+const token = readBearerToken(storageState);
+return request.newContext({ baseURL: resolveBaseURL(), extraHTTPHeaders: { Authorization: `Bearer ${token}` } });
+```
+
+Use `mainApi` / `anonApi` from `./fixtures` and relative paths; resolve ids from a prior response (`communities.api.spec.ts`: `list[0].id`).
+
+---
+
+## 3. Two tests per endpoint
+
+Per endpoint: one **success** test and one **intentional error** test that changes **exactly one** thing (no token, missing required field, empty body). Assert status and fields you expect; ensure the body does not leak secrets (passwords, full tokens).
+
+✅ **Good** — paired GET tests (`availability.api.spec.ts`):
+
+```typescript
+test('authenticated GET returns catalog contract @api', …, async ({ mainApi }) => {
+  await expectCatalogAuthenticatedGet(mainApi, PATH, …);
+});
+test('unauthenticated GET returns catalog status @api', …, async ({ anonApi }) => {
+  await expectCatalogUnauthenticatedGet(anonApi, PATH);
+});
+```
+
+❌ **Bad** — write path with only a happy path, no paired error (`children.api.spec.ts` today):
+
+```typescript
+test('POST create, GET me finds child, DELETE undo @api', …, async ({ mainApi, recordOwner }) => {
+  const created = await createHostChild(mainApi, payload);
+  // … no unauthenticated POST or single-field validation failure test
+});
+```
+
+Add the missing intentional-error test before treating `POST /api/v1/children` as fully covered.
+
+---
+
+## 4. Writes
+
+Run writes only when **undo is documented or observed** in `api/CATALOG.md`. Call `trackRecord` **immediately after** create so cleanup runs even if the test fails.
+
+✅ **Good** (`children.api.spec.ts` + catalog Writes table):
+
+```typescript
+const created = await createHostChild(mainApi, payload);
+trackRecord({ type: 'host-child', id: created.id, owner: recordOwner });
+```
+
+❌ **Bad** — write against catalog **inspected only** / no safe undo (`api/CATALOG.md`):
+
+```markdown
+| POST | `/api/v1/events` | no | inspected only |
+```
+
+Do not add a creating spec here until the catalog marks the flow safe and documents undo (see `support/api-client.ts` teardown).
+
+---
+
+## 5. Tags
+
+Exactly **one** tag per `test()` — `@api`. Never on `test.describe()`.
+
+✅ **Good** (`events.api.spec.ts`):
+
+```typescript
+test('authenticated GET returns catalog contract @api', …);
+test('unauthenticated GET returns catalog status @api', …);
+```
+
+❌ **Bad** — zero or duplicate tags on the same test (not present in `api/*.api.spec.ts`; keep it that way):
+
+```typescript
+test('GET events @api @regression', …);
+test.describe('Events API @api', () => { … });
+```
+
+---
+
+## 6. Evidence
+
+Label every claim: **executed**, **inspected only**, or **not yet tested**. Status or body copied from a spec, chat, or agent prediction is **not** evidence until observed in a run and recorded in `api/CATALOG.md`.
+
+✅ **Good** — constants and descriptions cite catalog evidence (`api/helpers/catalog-get.ts`, `me.api.spec.ts`):
+
+```typescript
+/** From api/CATALOG.md — unauthenticated GET (recorded in API test pass). */
+export const CATALOG_UNAUTH_STATUS = 401;
+// … 'expects HTTP 401, as recorded in api/CATALOG.md.'
+```
+
+❌ **Bad** — treating **inspected only** as **executed** (`api/CATALOG.md` quick reference):
+
+```markdown
+| POST | `/api/v1/events` | no | inspected only |
+```
+
+A GET-only spec (`events.api.spec.ts`) does not upgrade that row to executed; update the catalog after a real observation.

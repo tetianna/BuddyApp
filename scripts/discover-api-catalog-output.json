@@ -27,7 +27,7 @@
     "responseShape": "{ id:string, firstName:string, birthYear:number, birthMonth:number, age:number, gender:string, interests:array(0), avatarKey:string }",
     "evidence": "executed",
     "safeForTests": "no (write without observed undo)",
-    "reqBodySample": "{\"firstName\":\"ApiCat1792262238767\",\"birthYear\":2019,\"birthMonth\":8,\"gender\":\"boy\",\"avatarKey\":\"fox\",\"interests\":[]}"
+    "reqBodySample": "{\"firstName\":\"ApiCat1792435545374\",\"birthYear\":2019,\"birthMonth\":8,\"gender\":\"boy\",\"avatarKey\":\"fox\",\"interests\":[]}"
   },
   {
     "method": "DELETE",
@@ -79,6 +79,7 @@
     "path": "/api/v1/connections",
     "pages": [
       "Dashboard",
+      "Calendar",
       "Friends",
       "Communities",
       "Availability",
@@ -100,6 +101,7 @@
     "method": "GET",
     "path": "/api/v1/events",
     "pages": [
+      "Calendar",
       "Birthdays"
     ],
     "auth": "Authorization header",
@@ -112,7 +114,7 @@
   },
   {
     "method": "GET",
-    "path": "/api/v1/matches",
+    "path": "/api/v1/matches?days=21",
     "pages": [
       "Playdates"
     ],
@@ -129,6 +131,7 @@
     "path": "/api/v1/me",
     "pages": [
       "Dashboard",
+      "Calendar",
       "Friends",
       "Communities",
       "Availability",
@@ -150,8 +153,22 @@
     "method": "GET",
     "path": "/api/v1/playdates",
     "pages": [
+      "Playdates"
+    ],
+    "auth": "Authorization header",
+    "status": 200,
+    "requestFields": "—",
+    "responseShape": "array<object>",
+    "evidence": "executed",
+    "safeForTests": "yes",
+    "reqBodySample": ""
+  },
+  {
+    "method": "GET",
+    "path": "/api/v1/playdates?filter=upcoming",
+    "pages": [
       "Dashboard",
-      "Playdates",
+      "Calendar",
       "Dashboard (add child)"
     ],
     "auth": "Authorization header",
@@ -164,66 +181,7 @@
   },
   {
     "method": "GET",
-    "path": "/app",
-    "pages": [
-      "Friends",
-      "Communities",
-      "Availability",
-      "Playdates",
-      "Birthdays",
-      "Profile"
-    ],
-    "auth": "unknown",
-    "status": 200,
-    "requestFields": "—",
-    "responseShape": "(text)",
-    "evidence": "executed",
-    "safeForTests": "yes",
-    "reqBodySample": ""
-  },
-  {
-    "method": "GET",
-    "path": "/availability",
-    "pages": [
-      "Dashboard",
-      "Friends",
-      "Communities",
-      "Playdates",
-      "Birthdays",
-      "Profile",
-      "Dashboard (add child)"
-    ],
-    "auth": "unknown",
-    "status": 200,
-    "requestFields": "—",
-    "responseShape": "(text)",
-    "evidence": "executed",
-    "safeForTests": "yes",
-    "reqBodySample": ""
-  },
-  {
-    "method": "GET",
-    "path": "/birthdays",
-    "pages": [
-      "Dashboard",
-      "Friends",
-      "Communities",
-      "Availability",
-      "Playdates",
-      "Profile",
-      "Dashboard (add child)"
-    ],
-    "auth": "unknown",
-    "status": 200,
-    "requestFields": "—",
-    "responseShape": "(text)",
-    "evidence": "executed",
-    "safeForTests": "yes",
-    "reqBodySample": ""
-  },
-  {
-    "method": "GET",
-    "path": "/birthdays/{id}",
+    "path": "/app?_rsc=19vF35XyPfCE68wv",
     "pages": [
       "Birthdays"
     ],
@@ -237,16 +195,390 @@
   },
   {
     "method": "GET",
-    "path": "/calendar",
+    "path": "/app?_rsc=36LXVaZo2c7sZul5",
+    "pages": [
+      "Availability"
+    ],
+    "auth": "unknown",
+    "status": 200,
+    "requestFields": "—",
+    "responseShape": "(text)",
+    "evidence": "executed",
+    "safeForTests": "yes",
+    "reqBodySample": ""
+  },
+  {
+    "method": "GET",
+    "path": "/app?_rsc=9zxsg8cHQwEcShY6",
+    "pages": [
+      "Profile"
+    ],
+    "auth": "unknown",
+    "status": 200,
+    "requestFields": "—",
+    "responseShape": "(text)",
+    "evidence": "executed",
+    "safeForTests": "yes",
+    "reqBodySample": ""
+  },
+  {
+    "method": "GET",
+    "path": "/app?_rsc=Hi4npNUyb_wYQ8kT",
+    "pages": [
+      "Playdates"
+    ],
+    "auth": "unknown",
+    "status": 200,
+    "requestFields": "—",
+    "responseShape": "(text)",
+    "evidence": "executed",
+    "safeForTests": "yes",
+    "reqBodySample": ""
+  },
+  {
+    "method": "GET",
+    "path": "/app?_rsc=oT9V-YWcoVxkCstd",
+    "pages": [
+      "Friends"
+    ],
+    "auth": "unknown",
+    "status": 200,
+    "requestFields": "—",
+    "responseShape": "(text)",
+    "evidence": "executed",
+    "safeForTests": "yes",
+    "reqBodySample": ""
+  },
+  {
+    "method": "GET",
+    "path": "/app?_rsc=qCsKqtaqkMjo6Mvf",
+    "pages": [
+      "Communities"
+    ],
+    "auth": "unknown",
+    "status": 200,
+    "requestFields": "—",
+    "responseShape": "(text)",
+    "evidence": "executed",
+    "safeForTests": "yes",
+    "reqBodySample": ""
+  },
+  {
+    "method": "GET",
+    "path": "/app?_rsc=wI27_LP1QddoTvr8",
+    "pages": [
+      "Calendar"
+    ],
+    "auth": "unknown",
+    "status": 200,
+    "requestFields": "—",
+    "responseShape": "(text)",
+    "evidence": "executed",
+    "safeForTests": "yes",
+    "reqBodySample": ""
+  },
+  {
+    "method": "GET",
+    "path": "/availability?_rsc=19vF35XyPfCE68wv",
+    "pages": [
+      "Birthdays"
+    ],
+    "auth": "unknown",
+    "status": 200,
+    "requestFields": "—",
+    "responseShape": "(text)",
+    "evidence": "executed",
+    "safeForTests": "yes",
+    "reqBodySample": ""
+  },
+  {
+    "method": "GET",
+    "path": "/availability?_rsc=242O7JNRkEh70gAf",
     "pages": [
       "Dashboard",
-      "Friends",
-      "Communities",
-      "Availability",
-      "Playdates",
-      "Birthdays",
-      "Profile",
       "Dashboard (add child)"
+    ],
+    "auth": "unknown",
+    "status": 200,
+    "requestFields": "—",
+    "responseShape": "(text)",
+    "evidence": "executed",
+    "safeForTests": "yes",
+    "reqBodySample": ""
+  },
+  {
+    "method": "GET",
+    "path": "/availability?_rsc=9zxsg8cHQwEcShY6",
+    "pages": [
+      "Profile"
+    ],
+    "auth": "unknown",
+    "status": 200,
+    "requestFields": "—",
+    "responseShape": "(text)",
+    "evidence": "executed",
+    "safeForTests": "yes",
+    "reqBodySample": ""
+  },
+  {
+    "method": "GET",
+    "path": "/availability?_rsc=Hi4npNUyb_wYQ8kT",
+    "pages": [
+      "Playdates"
+    ],
+    "auth": "unknown",
+    "status": 200,
+    "requestFields": "—",
+    "responseShape": "(text)",
+    "evidence": "executed",
+    "safeForTests": "yes",
+    "reqBodySample": ""
+  },
+  {
+    "method": "GET",
+    "path": "/availability?_rsc=oT9V-YWcoVxkCstd",
+    "pages": [
+      "Friends"
+    ],
+    "auth": "unknown",
+    "status": 200,
+    "requestFields": "—",
+    "responseShape": "(text)",
+    "evidence": "executed",
+    "safeForTests": "yes",
+    "reqBodySample": ""
+  },
+  {
+    "method": "GET",
+    "path": "/availability?_rsc=qCsKqtaqkMjo6Mvf",
+    "pages": [
+      "Communities"
+    ],
+    "auth": "unknown",
+    "status": 200,
+    "requestFields": "—",
+    "responseShape": "(text)",
+    "evidence": "executed",
+    "safeForTests": "yes",
+    "reqBodySample": ""
+  },
+  {
+    "method": "GET",
+    "path": "/availability?_rsc=wI27_LP1QddoTvr8",
+    "pages": [
+      "Calendar"
+    ],
+    "auth": "unknown",
+    "status": 200,
+    "requestFields": "—",
+    "responseShape": "(text)",
+    "evidence": "executed",
+    "safeForTests": "yes",
+    "reqBodySample": ""
+  },
+  {
+    "method": "GET",
+    "path": "/birthdays?_rsc=242O7JNRkEh70gAf",
+    "pages": [
+      "Dashboard",
+      "Dashboard (add child)"
+    ],
+    "auth": "unknown",
+    "status": 200,
+    "requestFields": "—",
+    "responseShape": "(text)",
+    "evidence": "executed",
+    "safeForTests": "yes",
+    "reqBodySample": ""
+  },
+  {
+    "method": "GET",
+    "path": "/birthdays?_rsc=36LXVaZo2c7sZul5",
+    "pages": [
+      "Availability"
+    ],
+    "auth": "unknown",
+    "status": 200,
+    "requestFields": "—",
+    "responseShape": "(text)",
+    "evidence": "executed",
+    "safeForTests": "yes",
+    "reqBodySample": ""
+  },
+  {
+    "method": "GET",
+    "path": "/birthdays?_rsc=9zxsg8cHQwEcShY6",
+    "pages": [
+      "Profile"
+    ],
+    "auth": "unknown",
+    "status": 200,
+    "requestFields": "—",
+    "responseShape": "(text)",
+    "evidence": "executed",
+    "safeForTests": "yes",
+    "reqBodySample": ""
+  },
+  {
+    "method": "GET",
+    "path": "/birthdays?_rsc=Hi4npNUyb_wYQ8kT",
+    "pages": [
+      "Playdates"
+    ],
+    "auth": "unknown",
+    "status": 200,
+    "requestFields": "—",
+    "responseShape": "(text)",
+    "evidence": "executed",
+    "safeForTests": "yes",
+    "reqBodySample": ""
+  },
+  {
+    "method": "GET",
+    "path": "/birthdays?_rsc=oT9V-YWcoVxkCstd",
+    "pages": [
+      "Friends"
+    ],
+    "auth": "unknown",
+    "status": 200,
+    "requestFields": "—",
+    "responseShape": "(text)",
+    "evidence": "executed",
+    "safeForTests": "yes",
+    "reqBodySample": ""
+  },
+  {
+    "method": "GET",
+    "path": "/birthdays?_rsc=qCsKqtaqkMjo6Mvf",
+    "pages": [
+      "Communities"
+    ],
+    "auth": "unknown",
+    "status": 200,
+    "requestFields": "—",
+    "responseShape": "(text)",
+    "evidence": "executed",
+    "safeForTests": "yes",
+    "reqBodySample": ""
+  },
+  {
+    "method": "GET",
+    "path": "/birthdays?_rsc=wI27_LP1QddoTvr8",
+    "pages": [
+      "Calendar"
+    ],
+    "auth": "unknown",
+    "status": 200,
+    "requestFields": "—",
+    "responseShape": "(text)",
+    "evidence": "executed",
+    "safeForTests": "yes",
+    "reqBodySample": ""
+  },
+  {
+    "method": "GET",
+    "path": "/birthdays/{id}?_rsc=19vF35XyPfCE68wv",
+    "pages": [
+      "Birthdays"
+    ],
+    "auth": "unknown",
+    "status": 200,
+    "requestFields": "—",
+    "responseShape": "(text)",
+    "evidence": "executed",
+    "safeForTests": "yes",
+    "reqBodySample": ""
+  },
+  {
+    "method": "GET",
+    "path": "/calendar?_rsc=19vF35XyPfCE68wv",
+    "pages": [
+      "Birthdays"
+    ],
+    "auth": "unknown",
+    "status": 200,
+    "requestFields": "—",
+    "responseShape": "(text)",
+    "evidence": "executed",
+    "safeForTests": "yes",
+    "reqBodySample": ""
+  },
+  {
+    "method": "GET",
+    "path": "/calendar?_rsc=242O7JNRkEh70gAf",
+    "pages": [
+      "Dashboard",
+      "Dashboard (add child)"
+    ],
+    "auth": "unknown",
+    "status": 200,
+    "requestFields": "—",
+    "responseShape": "(text)",
+    "evidence": "executed",
+    "safeForTests": "yes",
+    "reqBodySample": ""
+  },
+  {
+    "method": "GET",
+    "path": "/calendar?_rsc=36LXVaZo2c7sZul5",
+    "pages": [
+      "Availability"
+    ],
+    "auth": "unknown",
+    "status": 200,
+    "requestFields": "—",
+    "responseShape": "(text)",
+    "evidence": "executed",
+    "safeForTests": "yes",
+    "reqBodySample": ""
+  },
+  {
+    "method": "GET",
+    "path": "/calendar?_rsc=9zxsg8cHQwEcShY6",
+    "pages": [
+      "Profile"
+    ],
+    "auth": "unknown",
+    "status": 200,
+    "requestFields": "—",
+    "responseShape": "(text)",
+    "evidence": "executed",
+    "safeForTests": "yes",
+    "reqBodySample": ""
+  },
+  {
+    "method": "GET",
+    "path": "/calendar?_rsc=Hi4npNUyb_wYQ8kT",
+    "pages": [
+      "Playdates"
+    ],
+    "auth": "unknown",
+    "status": 200,
+    "requestFields": "—",
+    "responseShape": "(text)",
+    "evidence": "executed",
+    "safeForTests": "yes",
+    "reqBodySample": ""
+  },
+  {
+    "method": "GET",
+    "path": "/calendar?_rsc=oT9V-YWcoVxkCstd",
+    "pages": [
+      "Friends"
+    ],
+    "auth": "unknown",
+    "status": 200,
+    "requestFields": "—",
+    "responseShape": "(text)",
+    "evidence": "executed",
+    "safeForTests": "yes",
+    "reqBodySample": ""
+  },
+  {
+    "method": "GET",
+    "path": "/calendar?_rsc=qCsKqtaqkMjo6Mvf",
+    "pages": [
+      "Communities"
     ],
     "auth": "unknown",
     "status": 200,
@@ -261,6 +593,7 @@
     "path": "/cdn-cgi/rum",
     "pages": [
       "Dashboard",
+      "Calendar",
       "Friends",
       "Communities",
       "Availability",
@@ -275,18 +608,27 @@
     "responseShape": "—",
     "evidence": "executed",
     "safeForTests": "no (write without observed undo)",
-    "reqBodySample": "{\"startTime\":1792262223999,\"pageloadId\":\"ea0e87ab-7fd8-4a92-8325-1cd725cf8202\",\"eventType\":1,\"nt\":\"navigate\",\"location\":\"https://test.buddytime.ca/app\",\"versions\":{\"fl\":\"2024.11.0\",\"js\":\"2026.10.1\",\"timings\":2},\"bi\":{\"be\":\"Blink\",\"bev\":\"153\",\"bv\":\"153\",\"ov\":\"11\"},\"memory\":{\"totalJSHeapSize\":10000000,\"usedJSHeapSize\":10000000,\"jsHeapSizeLimit\":3760000000},\"firstPaint\":0,\"firstContentfulPaint\":0,\"timingsV2\":{\"nextHopProtocol\":\"h2\",\"domainLookupStart\":10,\"domainLookupEnd\":17,\"connectStart\":17,\"connectEnd\":82,\"secureConnectionStart\":45,\"requestStart\":82,\"responseStart\":137,\"responseEnd\":139,\"domInteractive\":208,\"domComplete\":347,\"loadEventStart\":347,\"loadEventEnd\":347,\"finalResponseHeadersStart\":137,\"firstInterimResponseStart\":0,\"transferSize\":3299,\"decodedBodySize\":10080},\"siteToken\":\"5e53b9d"
+    "reqBodySample": "{\"startTime\":1792435524414,\"pageloadId\":\"20f8b4d7-122f-4a4f-b37f-f329375cc1d2\",\"eventType\":1,\"nt\":\"navigate\",\"location\":\"https://test.buddytime.ca/app\",\"versions\":{\"fl\":\"2024.11.0\",\"js\":\"2026.10.1\",\"timings\":2},\"bi\":{\"be\":\"Blink\",\"bev\":\"153\",\"bv\":\"153\",\"ov\":\"11\"},\"memory\":{\"totalJSHeapSize\":10000000,\"usedJSHeapSize\":10000000,\"jsHeapSizeLimit\":3760000000},\"firstPaint\":3484,\"firstContentfulPaint\":3484,\"timingsV2\":{\"nextHopProtocol\":\"h2\",\"domainLookupStart\":2747,\"domainLookupEnd\":2790,\"connectStart\":2790,\"connectEnd\":3228,\"secureConnectionStart\":2826,\"requestStart\":3229,\"responseStart\":3341,\"responseEnd\":3344,\"domInteractive\":3469,\"domComplete\":3562,\"loadEventStart\":3562,\"loadEventEnd\":3562,\"finalResponseHeadersStart\":3341,\"firstInterimResponseStart\":0,\"transferSize\":3299,\"decodedBodySize\":10"
   },
   {
     "method": "GET",
-    "path": "/communities",
+    "path": "/communities?_rsc=19vF35XyPfCE68wv",
+    "pages": [
+      "Birthdays"
+    ],
+    "auth": "unknown",
+    "status": 200,
+    "requestFields": "—",
+    "responseShape": "(text)",
+    "evidence": "executed",
+    "safeForTests": "yes",
+    "reqBodySample": ""
+  },
+  {
+    "method": "GET",
+    "path": "/communities?_rsc=242O7JNRkEh70gAf",
     "pages": [
       "Dashboard",
-      "Friends",
-      "Availability",
-      "Playdates",
-      "Birthdays",
-      "Profile",
       "Dashboard (add child)"
     ],
     "auth": "unknown",
@@ -299,7 +641,77 @@
   },
   {
     "method": "GET",
-    "path": "/communities/{id}",
+    "path": "/communities?_rsc=36LXVaZo2c7sZul5",
+    "pages": [
+      "Availability"
+    ],
+    "auth": "unknown",
+    "status": 200,
+    "requestFields": "—",
+    "responseShape": "(text)",
+    "evidence": "executed",
+    "safeForTests": "yes",
+    "reqBodySample": ""
+  },
+  {
+    "method": "GET",
+    "path": "/communities?_rsc=9zxsg8cHQwEcShY6",
+    "pages": [
+      "Profile"
+    ],
+    "auth": "unknown",
+    "status": 200,
+    "requestFields": "—",
+    "responseShape": "(text)",
+    "evidence": "executed",
+    "safeForTests": "yes",
+    "reqBodySample": ""
+  },
+  {
+    "method": "GET",
+    "path": "/communities?_rsc=Hi4npNUyb_wYQ8kT",
+    "pages": [
+      "Playdates"
+    ],
+    "auth": "unknown",
+    "status": 200,
+    "requestFields": "—",
+    "responseShape": "(text)",
+    "evidence": "executed",
+    "safeForTests": "yes",
+    "reqBodySample": ""
+  },
+  {
+    "method": "GET",
+    "path": "/communities?_rsc=oT9V-YWcoVxkCstd",
+    "pages": [
+      "Friends"
+    ],
+    "auth": "unknown",
+    "status": 200,
+    "requestFields": "—",
+    "responseShape": "(text)",
+    "evidence": "executed",
+    "safeForTests": "yes",
+    "reqBodySample": ""
+  },
+  {
+    "method": "GET",
+    "path": "/communities?_rsc=wI27_LP1QddoTvr8",
+    "pages": [
+      "Calendar"
+    ],
+    "auth": "unknown",
+    "status": 200,
+    "requestFields": "—",
+    "responseShape": "(text)",
+    "evidence": "executed",
+    "safeForTests": "yes",
+    "reqBodySample": ""
+  },
+  {
+    "method": "GET",
+    "path": "/communities/{id}?_rsc=qCsKqtaqkMjo6Mvf",
     "pages": [
       "Communities"
     ],
@@ -313,7 +725,7 @@
   },
   {
     "method": "GET",
-    "path": "/communities/new",
+    "path": "/communities/new?_rsc=qCsKqtaqkMjo6Mvf",
     "pages": [
       "Communities"
     ],
@@ -327,14 +739,23 @@
   },
   {
     "method": "GET",
-    "path": "/friends",
+    "path": "/friends?_rsc=19vF35XyPfCE68wv",
+    "pages": [
+      "Birthdays"
+    ],
+    "auth": "unknown",
+    "status": 200,
+    "requestFields": "—",
+    "responseShape": "(text)",
+    "evidence": "executed",
+    "safeForTests": "yes",
+    "reqBodySample": ""
+  },
+  {
+    "method": "GET",
+    "path": "/friends?_rsc=242O7JNRkEh70gAf",
     "pages": [
       "Dashboard",
-      "Communities",
-      "Availability",
-      "Playdates",
-      "Birthdays",
-      "Profile",
       "Dashboard (add child)"
     ],
     "auth": "unknown",
@@ -347,14 +768,93 @@
   },
   {
     "method": "GET",
-    "path": "/playdates",
+    "path": "/friends?_rsc=36LXVaZo2c7sZul5",
+    "pages": [
+      "Availability"
+    ],
+    "auth": "unknown",
+    "status": 200,
+    "requestFields": "—",
+    "responseShape": "(text)",
+    "evidence": "executed",
+    "safeForTests": "yes",
+    "reqBodySample": ""
+  },
+  {
+    "method": "GET",
+    "path": "/friends?_rsc=9zxsg8cHQwEcShY6",
+    "pages": [
+      "Profile"
+    ],
+    "auth": "unknown",
+    "status": 200,
+    "requestFields": "—",
+    "responseShape": "(text)",
+    "evidence": "executed",
+    "safeForTests": "yes",
+    "reqBodySample": ""
+  },
+  {
+    "method": "GET",
+    "path": "/friends?_rsc=Hi4npNUyb_wYQ8kT",
+    "pages": [
+      "Playdates"
+    ],
+    "auth": "unknown",
+    "status": 200,
+    "requestFields": "—",
+    "responseShape": "(text)",
+    "evidence": "executed",
+    "safeForTests": "yes",
+    "reqBodySample": ""
+  },
+  {
+    "method": "GET",
+    "path": "/friends?_rsc=qCsKqtaqkMjo6Mvf",
+    "pages": [
+      "Communities"
+    ],
+    "auth": "unknown",
+    "status": 200,
+    "requestFields": "—",
+    "responseShape": "(text)",
+    "evidence": "executed",
+    "safeForTests": "yes",
+    "reqBodySample": ""
+  },
+  {
+    "method": "GET",
+    "path": "/friends?_rsc=wI27_LP1QddoTvr8",
+    "pages": [
+      "Calendar"
+    ],
+    "auth": "unknown",
+    "status": 200,
+    "requestFields": "—",
+    "responseShape": "(text)",
+    "evidence": "executed",
+    "safeForTests": "yes",
+    "reqBodySample": ""
+  },
+  {
+    "method": "GET",
+    "path": "/playdates?_rsc=19vF35XyPfCE68wv",
+    "pages": [
+      "Birthdays"
+    ],
+    "auth": "unknown",
+    "status": 200,
+    "requestFields": "—",
+    "responseShape": "(text)",
+    "evidence": "executed",
+    "safeForTests": "yes",
+    "reqBodySample": ""
+  },
+  {
+    "method": "GET",
+    "path": "/playdates?_rsc=242O7JNRkEh70gAf",
     "pages": [
       "Dashboard",
-      "Friends",
-      "Communities",
-      "Availability",
-      "Birthdays",
-      "Profile",
       "Dashboard (add child)"
     ],
     "auth": "unknown",
@@ -367,7 +867,77 @@
   },
   {
     "method": "GET",
-    "path": "/playdates/new",
+    "path": "/playdates?_rsc=36LXVaZo2c7sZul5",
+    "pages": [
+      "Availability"
+    ],
+    "auth": "unknown",
+    "status": 200,
+    "requestFields": "—",
+    "responseShape": "(text)",
+    "evidence": "executed",
+    "safeForTests": "yes",
+    "reqBodySample": ""
+  },
+  {
+    "method": "GET",
+    "path": "/playdates?_rsc=9zxsg8cHQwEcShY6",
+    "pages": [
+      "Profile"
+    ],
+    "auth": "unknown",
+    "status": 200,
+    "requestFields": "—",
+    "responseShape": "(text)",
+    "evidence": "executed",
+    "safeForTests": "yes",
+    "reqBodySample": ""
+  },
+  {
+    "method": "GET",
+    "path": "/playdates?_rsc=oT9V-YWcoVxkCstd",
+    "pages": [
+      "Friends"
+    ],
+    "auth": "unknown",
+    "status": 200,
+    "requestFields": "—",
+    "responseShape": "(text)",
+    "evidence": "executed",
+    "safeForTests": "yes",
+    "reqBodySample": ""
+  },
+  {
+    "method": "GET",
+    "path": "/playdates?_rsc=qCsKqtaqkMjo6Mvf",
+    "pages": [
+      "Communities"
+    ],
+    "auth": "unknown",
+    "status": 200,
+    "requestFields": "—",
+    "responseShape": "(text)",
+    "evidence": "executed",
+    "safeForTests": "yes",
+    "reqBodySample": ""
+  },
+  {
+    "method": "GET",
+    "path": "/playdates?_rsc=wI27_LP1QddoTvr8",
+    "pages": [
+      "Calendar"
+    ],
+    "auth": "unknown",
+    "status": 200,
+    "requestFields": "—",
+    "responseShape": "(text)",
+    "evidence": "executed",
+    "safeForTests": "yes",
+    "reqBodySample": ""
+  },
+  {
+    "method": "GET",
+    "path": "/playdates/new?_rsc=242O7JNRkEh70gAf",
     "pages": [
       "Dashboard",
       "Dashboard (add child)"

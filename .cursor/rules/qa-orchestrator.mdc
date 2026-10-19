@@ -34,7 +34,7 @@ Drive a QA task to **Done** by delegating. The only work you do yourself is read
 - **Atlassian MCP** — Jira and Confluence
 - **GitHub MCP or `gh`** — runs, PRs, artifacts
 - **Terminal** — `npx playwright test`
-- **Subagents** — `test-writer`, `triage`, `bug-reporter`
+- **Subagents** — `api-test-writer`, `test-writer`, `triage`, `bug-reporter`
 
 ## Skills
 
@@ -45,24 +45,30 @@ Drive a QA task to **Done** by delegating. The only work you do yourself is read
 | `ci-failure-triage` | Via `triage` after every run (pass or fail) — always evidence + scorer |
 | `self-heal` | Drift only, after triage |
 | `jira-bug-reporter` | Via `bug-reporter` after real-bug classification |
+| `api-discovery` | Refresh `api/CATALOG.md` when the spec is missing or stale |
+| `api-contract-tests` | Plan API coverage from a spec or catalog before `api-test-writer` |
 | `api-cleanup` | Ensure generated tests tear down data |
 | `pom-conventions` | Ensure POMs match project conventions |
 | `eval-report` | **Mandatory before Done** when any trigger fired this session |
 
 ## Routing
 
+- **API endpoint only** (no page in acceptance criteria) → plan with **`api-contract-tests`** from the spec or **`api/CATALOG.md`** → delegate **`api-test-writer`** → run **`npx playwright test --project=api`**.
+- **Page flow** → **`test-writer`**, as before (`features/*.feature.md` from analyzer or explore-and-generate).
+- **Both** → **both** paths; **API first**.
+
 **With a ticket**
 
-1. Analyze (`jira-ticket-analyzer`) → plan saved to `features/<key>.feature.md`
-2. Delegate → `test-writer`
-3. Run the suite → **triage** (evidence + scorer always; see below)
+1. Analyze (`jira-ticket-analyzer`) → plan(s) per bullets above (`features/<key>.feature.md` for UI; spec or catalog for API).
+2. Delegate per **Routing** (`api-test-writer`, `test-writer`, or both — API first when both).
+3. Run the relevant project(s) → **triage** (evidence + scorer always; see below).
 4. If red → **Heal on red** (below)
 
 **No ticket**
 
-1. `explore-and-generate` → plan saved to `features/explore-<slug>.feature.md`
-2. Delegate → `test-writer`
-3. Run → heal on red if needed
+1. `explore-and-generate` → plan saved to `features/explore-<slug>.feature.md` (page flows); use **`api-discovery`** + **`api-contract-tests`** when the gap is API-only.
+2. Delegate per **Routing**.
+3. Run → **triage**; heal on red if needed.
 
 ## Triage and scorer (every run)
 
@@ -86,6 +92,8 @@ Only when the run **failed** and scorer is **act** + **drift** (or approved esca
 - Stop if green requires an assertion change.
 - Stop if the **same locator error** persists after heal attempts.
 
+**API failures (`api/` specs):** Evidence and **`score-evidence.ts`** apply the same way as UI runs. There is no page object to heal, so **act** + **drift** cannot apply — a changed HTTP status or response field is **not** self-heal. Triage records evidence for a **contract change** (catalog or spec update) or a **bug**; route to **`bug-reporter`** when classification is bug, never to **`self-heal`**.
+
 ## Backlog mode
 
 The **outer runner** (Cursor Automation, headless `agent -p`, or a local batch):
@@ -93,7 +101,7 @@ The **outer runner** (Cursor Automation, headless `agent -p`, or a local batch):
 1. Queries Jira project `JIRA_PROJECT_KEY` (`AQPBT`) for status **In QA** without label `tests-generated`
 2. Passes **at most one** ticket per run; empty queue → no run
 
-**Per ticket:** analyze → `test-writer` → run → heal on red.
+**Per ticket:** analyze → delegate per **Routing** → run → **triage** → heal on red when applicable.
 
 **Output:** one PR per ticket, ticket linked in PR body, label `tests-generated` on the ticket.
 

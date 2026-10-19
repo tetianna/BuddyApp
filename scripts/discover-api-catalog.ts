@@ -15,6 +15,7 @@ dotenv.config();
 
 const ROUTES: { page: string; path: string }[] = [
   { page: 'Dashboard', path: AppRoute.Dashboard },
+  { page: 'Calendar', path: AppRoute.Calendar },
   { page: 'Friends', path: AppRoute.Friends },
   { page: 'Communities', path: AppRoute.Communities },
   { page: 'Availability', path: AppRoute.Availability },
@@ -49,6 +50,9 @@ function normalizePath(url: string): string {
     '/{id}',
   );
   p = p.replace(/\/\d+(?=\/|$)/g, '/{id}');
+  if (u.search) {
+    p += u.search;
+  }
   return p;
 }
 
