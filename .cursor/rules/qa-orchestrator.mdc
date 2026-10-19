@@ -53,9 +53,11 @@ Drive a QA task to **Done** by delegating. The only work you do yourself is read
 
 ## Routing
 
-- **API endpoint only** (no page in acceptance criteria) → plan with **`api-contract-tests`** from the spec or **`api/CATALOG.md`** → delegate **`api-test-writer`** → run **`npx playwright test --project=api`**.
-- **Page flow** → **`test-writer`**, as before (`features/*.feature.md` from analyzer or explore-and-generate).
-- **Both** → **both** paths; **API first**.
+| Work | Plan | Delegate | Run |
+|------|------|----------|-----|
+| **API endpoint only** (no page in acceptance criteria) | **`api-contract-tests`** from the spec or **`api/CATALOG.md`**; optional **`api-discovery`** if the catalog is stale — specs follow **`api-conventions`** | **`api-test-writer`** | **`npx playwright test --project=api`** |
+| **Page flow** | `features/*.feature.md` from **`jira-ticket-analyzer`** or **`explore-and-generate`** | **`test-writer`** | App specs / suite |
+| **Both** | API plan first, then UI plan | **`api-test-writer`**, then **`test-writer`** | API project first, then app specs |
 
 **With a ticket**
 

@@ -44,6 +44,7 @@ Non-negotiables for every task. Details and examples: `playwright-conventions.md
 | Rule | Role |
 |------|------|
 | `qa-orchestrator` | Coordinate tickets, CI, and backlog; route API vs UI delegation |
+| `api-conventions` | API tests in `api/` — catalog/spec sources, paired GET tests, evidence labels |
 
 **Skills** (`.cursor/skills/`)
 
