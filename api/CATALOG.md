@@ -79,15 +79,34 @@ Example **POST** body (unique name in session; shape only):
 
 ---
 
+## Authorization (two families)
+
+Cross-family checks use **mainApi** (main family) and **altApi** (alt family, `APP_ALT_USER_*` + `ALT_AUTH_FILE`). Unauthenticated calls use **anonApi** (no `Authorization` header).
+
+| Scenario | Method | Endpoint | Caller | Status | Follow-up (executed) | Evidence |
+|----------|--------|----------|--------|--------|----------------------|----------|
+| Delete another family’s host child | DELETE | `/api/v1/children/{id}` | alt token, id created by main | **404** | `GET /api/v1/me` as main still includes child id/name; alt `/me` does not | executed |
+| Delete host child with no token | DELETE | `/api/v1/children/{id}` | no token, id created by main | **401** | `GET /api/v1/me` as main still includes child id/name | executed |
+
+**Not yet tested (authorization):**
+
+- `POST /api/v1/children` without token (reads catalog **401** only; write path not observed)
+- `DELETE` with unknown id (valid UUID shape) as main
+- `DELETE` same id twice after successful main-family delete
+- Cross-family or anonymous access on other write endpoints (events, availability, playdates, profile, admin)
+- Expired or wrong-family token on DELETE (only no-token and alt-on-main-child observed)
+
+---
+
 ## Not yet tested
 
 - Pagination (`page`, `cursor`, `limit`) on any GET
 - Error JSON for 4xx / 5xx
 - Rate limits
-- Calls with an **expired** token (anonymous **401** is cataloged above)
+- Calls with an **expired** token (anonymous **401** on GET reads and on DELETE children without token — see Authorization section)
 - Other writes: invites, community join/create, availability save, playdate create/cancel, profile update, admin
 - Query filters on `connections`, `matches`, `events` (Calendar uses `playdates?filter=upcoming` — cataloged above)
 
 ---
 
-*API tests: `npx playwright test --project=api` (see `api/*.api.spec.ts`, `api/fixtures.ts`).*
+*API tests: `npx playwright test --project=api` (see `api/*.api.spec.ts`, `api/fixtures.ts`, `api/authorization.api.spec.ts`).*
