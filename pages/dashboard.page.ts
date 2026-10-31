@@ -23,6 +23,7 @@ export class DashboardPage {
   readonly seeAllFriendsLink: Locator;
   readonly setUpAvailabilityLink: Locator;
   readonly kidsSection: Locator;
+  readonly myKidsStatBlock: Locator;
 
   constructor(private readonly page: Page) {
     this.header = new HeaderComponent(page);
@@ -47,6 +48,9 @@ export class DashboardPage {
         has: this.addChildButton,
       })
       .first();
+    this.myKidsStatBlock = page.locator('div').filter({
+      has: page.getByText('My Kids', { exact: true }),
+    });
   }
 
   /** Opens the signed-in dashboard. */
@@ -68,6 +72,31 @@ export class DashboardPage {
   async readChildFirstNames(): Promise<string[]> {
     const lines = await this.kidsSection.getByText(/^[A-Za-z][\w]*, \d+/).allTextContents();
     return lines.map((line) => line.split(',')[0]?.trim() ?? '').filter(Boolean);
+  }
+
+  /** Value on the **My Kids** dashboard stat card (not the add-child form). */
+  async readMyKidsCount(): Promise<number> {
+    const stat = this.myKidsStatBlock.first().getByText(/^\d+$/).first();
+    return Number(await stat.innerText());
+  }
+
+  /** Locator for one kid summary line inside the My Kids panel. */
+  childSummaryLine(summaryText: string): Locator {
+    return this.kidsSection.getByText(summaryText, { exact: true });
+  }
+
+  /**
+   * Removes one host child by first name (matches the `Name, age · …` row in My Kids).
+   * @param firstName Host child first name shown on the dashboard
+   */
+  async removeChild(firstName: string): Promise<void> {
+    const escaped = firstName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const row = this.kidsSection
+      .getByRole('button', { name: 'remove' })
+      .locator('..')
+      .filter({ hasText: new RegExp(`${escaped}, \\d+ ·`) });
+    await row.getByRole('button', { name: 'remove' }).click();
+    await this.waitForKidsSectionReady();
   }
 
   /** Removes every child row on the dashboard (My Kids section). */
