@@ -6,6 +6,7 @@ import {
   INVITE_BY_EMAIL_HELPER_COPY,
   RSVP_EMPTY_STATE_COPY,
 } from '../test-data/birthday-party.copy';
+import { AppRoute } from '../test-data/routes';
 
 /** Host manage view at `/birthdays/{partyId}` after **Manage →**. */
 export class BirthdayPartyManagePage {
@@ -66,7 +67,7 @@ export class BirthdayPartyManagePage {
     await this.cancelPartyButton.click();
   }
 
-  /** Accepts the native **Cancel party** confirm and waits for navigation back to the list. */
+  /** Accepts the native **Cancel party** confirm, waits for cancel API, then opens the list. */
   async cancelPartyAndReturnToList(): Promise<void> {
     this.page.once('dialog', (dialog) => {
       if (dialog.message() !== CANCEL_PARTY_CONFIRM_MESSAGE) {
@@ -74,7 +75,15 @@ export class BirthdayPartyManagePage {
       }
       void dialog.accept();
     });
+    const cancelResponse = this.page.waitForResponse(
+      (response) =>
+        response.request().method() === 'POST' &&
+        /\/api\/v1\/events\/[^/]+\/cancel\/?$/.test(new URL(response.url()).pathname) &&
+        response.ok(),
+    );
     await this.cancelPartyButton.click();
-    await this.page.waitForURL(/\/birthdays(\/[0-9a-f-]+)?\/?(\?|$)/i);
+    await cancelResponse;
+    await this.page.goto(AppRoute.Birthdays);
+    await this.page.waitForURL(new RegExp(`${AppRoute.Birthdays}(\\?|$)`));
   }
 }

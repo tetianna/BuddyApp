@@ -37,6 +37,30 @@ export class BirthdaysPage {
     return this.page.getByText(partyTitle, { exact: false });
   }
 
+  /** Upcoming list row with **Manage →** for the given party title. */
+  upcomingPartyRowWithManage(partyTitle: string): Locator {
+    return this.page
+      .locator('div')
+      .filter({ has: this.page.getByRole('link', { name: /Manage/i }) })
+      .filter({ has: this.page.getByText(partyTitle, { exact: false }) });
+  }
+
+  /** **Past & cancelled** row for a party (title, **Cancelled** label, **View** link). */
+  cancelledPartyRow(partyTitle: string): Locator {
+    const pastCancelledSection = this.page
+      .locator('.card')
+      .filter({ has: this.page.getByText('Past & cancelled', { exact: false }) });
+    return pastCancelledSection
+      .locator('.pd-row')
+      .filter({ has: this.page.getByText(partyTitle, { exact: false }) })
+      .filter({ has: this.page.getByText('Cancelled', { exact: true }) });
+  }
+
+  /** **Manage →** link for a party id on the upcoming list. */
+  manageLinkForPartyId(partyId: string): Locator {
+    return this.page.locator(`a[href*="/birthdays/${partyId}"]`).filter({ hasText: /Manage/i });
+  }
+
   /** Opens the first upcoming party manage screen and waits for `/birthdays/{partyId}`. */
   async openFirstManageParty(): Promise<void> {
     await this.firstManageLink.click();

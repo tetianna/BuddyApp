@@ -70,3 +70,36 @@ export function buildBirthdayPartyFormInput(
 
   return { ...defaults, ...overrides };
 }
+
+/** Request body for `POST /api/v1/events` (observed via UI create, 2026-11-01). */
+export type CreateBirthdayEventPayload = {
+  childId: string;
+  title: string;
+  startsAt: string;
+  venueText: string;
+  details: string;
+  cardKey: string;
+};
+
+/** Maps invitation card UI label to API `cardKey` (observed: Balloons → `balloons`). */
+export function invitationCardToCardKey(theme: InvitationCardTheme): string {
+  if (theme === InvitationCardTheme.Balloons) {
+    return 'balloons';
+  }
+  throw new Error(`POST /api/v1/events cardKey not observed for theme: ${theme}`);
+}
+
+/** Builds `POST /api/v1/events` JSON from the same factory input as the UI form. */
+export function buildBirthdayEventApiPayload(
+  input: BirthdayPartyFormInput,
+  childId: string,
+): CreateBirthdayEventPayload {
+  return {
+    childId,
+    title: input.partyTitle,
+    startsAt: new Date(input.scheduledAt).toISOString(),
+    venueText: input.venue,
+    details: input.guestDetails,
+    cardKey: invitationCardToCardKey(input.invitationCard),
+  };
+}

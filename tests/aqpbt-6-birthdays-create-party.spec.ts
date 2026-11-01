@@ -263,6 +263,28 @@ test.describe('AQPBT-6 — birthdays create party', () => {
     await expect(managePage.cancelPartyButton).toBeVisible();
   });
 
+  test('AQPBT-6 — cancelled party appears in Past & cancelled column @regression', async ({
+    page,
+  }) => {
+    const input = buildBirthdayPartyFormInput();
+    const birthdaysPage = new BirthdaysPage(page);
+    await birthdaysPage.goto();
+    await birthdaysPage.form.fillFromInput(input);
+    await birthdaysPage.form.createPartyButton.click();
+    await birthdaysPage.waitForPartiesListReady();
+    await birthdaysPage.openManageParty(input.partyTitle);
+
+    const managePage = new BirthdayPartyManagePage(page);
+    await managePage.cancelPartyAndReturnToList();
+    await birthdaysPage.waitForPartiesListReady();
+
+    await expect(birthdaysPage.upcomingPartyRowWithManage(input.partyTitle)).toHaveCount(0);
+    await expect(birthdaysPage.cancelledPartyRow(input.partyTitle)).toBeVisible();
+    await expect(
+      birthdaysPage.cancelledPartyRow(input.partyTitle).getByText('Cancelled', { exact: true }),
+    ).toBeVisible();
+  });
+
   test('AQPBT-6 — optional birthday child placeholder still creates party @regression', async ({
     page,
   }) => {

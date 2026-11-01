@@ -5,6 +5,7 @@ import { request, type APIRequestContext } from '@playwright/test';
 
 import { ALT_AUTH_FILE, AUTH_FILE } from './auth.constants';
 import type { RecordOwner, RecordType } from './record-tracker';
+import type { CreateBirthdayEventPayload } from '../test-data/factories/birthday-party.factory';
 
 type StorageStateFile = {
   origins?: Array<{ localStorage?: Array<{ name: string; value: string }> }>;
@@ -88,6 +89,13 @@ export type CreateHostChildPayload = {
   interests: string[];
 };
 
+export type BirthdayEventResponse = {
+  id: string;
+  kind: string;
+  title: string;
+  status: string;
+};
+
 /** Creates a host child (`POST /api/v1/children`). */
 export async function createHostChild(
   api: APIRequestContext,
@@ -98,6 +106,18 @@ export async function createHostChild(
     throw new Error(`createHostChild failed: HTTP ${response.status()} ${await response.text()}`);
   }
   return (await response.json()) as HostChildResponse;
+}
+
+/** Creates a birthday event (`POST /api/v1/events`). Observed undo: cancel via `cancelBirthdayEvent`. */
+export async function createBirthdayEvent(
+  api: APIRequestContext,
+  payload: CreateBirthdayEventPayload,
+): Promise<BirthdayEventResponse> {
+  const response = await api.post('/api/v1/events', { data: payload });
+  if (response.status() !== 201) {
+    throw new Error(`createBirthdayEvent failed: HTTP ${response.status()} ${await response.text()}`);
+  }
+  return (await response.json()) as BirthdayEventResponse;
 }
 
 /** Removes a host child (`DELETE /api/v1/children/{id}`). */
