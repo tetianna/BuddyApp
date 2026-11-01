@@ -1,0 +1,93 @@
+[
+  {
+    "endpoint": "GET /api/v1/me",
+    "who": "altApi",
+    "status": 200,
+    "outcome": "HELD",
+    "evidence": "altApi HTTP 200; body excluded marker child; mainApi /me still includes marker."
+  },
+  {
+    "endpoint": "GET /api/v1/connections",
+    "who": "altApi",
+    "status": 200,
+    "outcome": "HELD",
+    "evidence": "altApi HTTP 200; body excluded marker child; mainApi /me still includes marker."
+  },
+  {
+    "endpoint": "GET /api/v1/communities/{id}",
+    "who": "altApi",
+    "status": 404,
+    "outcome": "HELD",
+    "evidence": "altApi HTTP 404; mainApi /me still includes marker (no cross-family read)."
+  },
+  {
+    "endpoint": "GET /api/v1/availability",
+    "who": "altApi",
+    "status": 200,
+    "outcome": "HELD",
+    "evidence": "altApi HTTP 200; body excluded marker child; mainApi /me still includes marker."
+  },
+  {
+    "endpoint": "GET /api/v1/playdates",
+    "who": "altApi",
+    "status": 200,
+    "outcome": "HELD",
+    "evidence": "altApi HTTP 200; body excluded marker child; mainApi /me still includes marker."
+  },
+  {
+    "endpoint": "GET /api/v1/playdates?filter=upcoming",
+    "who": "altApi",
+    "status": 200,
+    "outcome": "HELD",
+    "evidence": "altApi HTTP 200; body excluded marker child; mainApi /me still includes marker."
+  },
+  {
+    "endpoint": "GET /api/v1/matches",
+    "who": "altApi",
+    "status": 200,
+    "outcome": "HELD",
+    "evidence": "altApi HTTP 200; body excluded marker child; mainApi /me still includes marker."
+  },
+  {
+    "endpoint": "GET /api/v1/events",
+    "who": "altApi",
+    "status": 200,
+    "outcome": "HELD",
+    "evidence": "altApi HTTP 200; body excluded marker child; mainApi /me still includes marker."
+  },
+  {
+    "endpoint": "GET /api/v1/me",
+    "who": "anonApi",
+    "status": 401,
+    "outcome": "HELD",
+    "evidence": "anonApi HTTP 401 matches catalog unauthenticated GET contract."
+  },
+  {
+    "endpoint": "GET /api/v1/connections",
+    "who": "anonApi",
+    "status": 401,
+    "outcome": "HELD",
+    "evidence": "anonApi HTTP 401 matches catalog unauthenticated GET contract."
+  },
+  {
+    "endpoint": "GET /api/v1/communities/{id}",
+    "who": "anonApi",
+    "status": 401,
+    "outcome": "HELD",
+    "evidence": "anonApi HTTP 401 matches catalog unauthenticated GET contract."
+  },
+  {
+    "endpoint": "DELETE /api/v1/children/{id}",
+    "who": "altApi",
+    "status": 404,
+    "outcome": "HELD",
+    "evidence": "altApi HTTP 404; main /me still includes child; alt /me excludes child."
+  },
+  {
+    "endpoint": "DELETE /api/v1/children/{id}",
+    "who": "anonApi",
+    "status": 401,
+    "outcome": "HELD",
+    "evidence": "anonApi HTTP 401; main /me still includes child."
+  }
+]
